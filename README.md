@@ -1,4 +1,4 @@
-# 🛒 E-commerce Fullstack - Proyecto ForIT
+# 🛒 E-commerce Fullstack - Proyecto Academia ForIT
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue)
@@ -12,7 +12,7 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 - **Autenticación de usuarios** (Registro/Login con JWT)
 - **Roles y permisos** (Admin/Customer)
 - **CRUD de productos** (Solo para admins)
-- **Carrito de compras** 
+- **Carrito de compras**
 - **API RESTful** con Express
 - **Frontend** (Próximamente con React)
 
@@ -34,16 +34,16 @@ mi-proyecto/
 
 ## 🔧 Tecnologías clave
 
-| Área           | Tecnologías                                                                 |
-|----------------|----------------------------------------------------------------------------|
-| Backend        | Node.js, Express, TypeScript, JWT                                          |
-| Dominio        | Arquitectura limpia, TDD, DDD                                              |
-| Frontend       | React (Próximamente)                                                       |
-| Base de datos  | MongoDB/PostgreSQL (Implementación futura)                                 |
-| Herramientas   | Git, GitHub, Postman, Jest (Testing)                                       |
+| Área          | Tecnologías                                |
+| ------------- | ------------------------------------------ |
+| Backend       | Node.js, Express, TypeScript, JWT          |
+| Dominio       | Arquitectura limpia, TDD, DDD              |
+| Frontend      | React (Próximamente)                       |
+| Base de datos | MongoDB/PostgreSQL (Implementación futura) |
+| Herramientas  | Git, GitHub, Postman, Jest (Testing)       |
 
 ---
 
 ## 📜 **Licencia**
 
-Proyecto educativo para **ForIT 2025**
+Proyecto educativo para **Academia ForIT 2025**
