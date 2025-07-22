@@ -4,6 +4,7 @@ import {
   mockCartRepository,
   MockedCartRepository,
 } from "../mocks/cart-repository-mock";
+import { CartProps } from "../entities/Cart";
 
 describe("AddToCart Use Case", () => {
   let validRequest: AddToCartRequest;
@@ -31,5 +32,40 @@ describe("AddToCart Use Case", () => {
       quantity: validRequest.quantity,
     });
     expect(mockRepository.carts).toHaveLength(1);
+  });
+
+  it("should throw an error if userId is missing", async () => {
+    const invalidRequest = { ...validRequest, userId: "" };
+    await expect(() =>
+      AddToCart(invalidRequest, mockRepository)
+    ).rejects.toThrow("User ID is required");
+  });
+
+  it("should throw an error if productId is missing", async () => {
+    const invalidRequest = { ...validRequest, productId: "" };
+    await expect(() =>
+      AddToCart(invalidRequest, mockRepository)
+    ).rejects.toThrow("Product ID is required");
+  });
+
+  it("should throw an error if productName is missing", async () => {
+    const invalidRequest = { ...validRequest, productName: "" };
+    await expect(() =>
+      AddToCart(invalidRequest, mockRepository)
+    ).rejects.toThrow("Product name is required");
+  });
+
+  it("should throw an error if productPrice is missing", async () => {
+    const invalidRequest = { ...validRequest, productPrice: "" };
+    await expect(() =>
+      AddToCart(invalidRequest, mockRepository)
+    ).rejects.toThrow("Product price is required");
+  });
+
+  it("should throw an error if quantity is zero or negative", async () => {
+    const invalidRequest = { ...validRequest, quantity: 0 };
+    await expect(() =>
+      AddToCart(invalidRequest, mockRepository)
+    ).rejects.toThrow("Quantity must be greater than 0");
   });
 });
