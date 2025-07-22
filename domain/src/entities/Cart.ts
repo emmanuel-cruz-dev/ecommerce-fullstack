@@ -1,9 +1,7 @@
-import { ProductProps } from "./Product";
-
 export interface CartProps {
   id: string;
   userId: string;
-  items: ProductProps[];
+  items: CartItemProps[];
 }
 
 export interface CartItemProps {
