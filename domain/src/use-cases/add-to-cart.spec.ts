@@ -68,4 +68,58 @@ describe("AddToCart Use Case", () => {
       AddToCart(invalidRequest, mockRepository)
     ).rejects.toThrow("Quantity must be greater than 0");
   });
+
+  it("should add new item to existing cart", async () => {
+    const existingCart = {
+      id: "cart-1",
+      userId: validRequest.userId,
+      items: [
+        {
+          productId: "existing-product",
+          quantity: 1,
+        },
+      ],
+    };
+    mockRepository.saveCart(existingCart);
+
+    const newRequest = {
+      ...validRequest,
+      productId: "new-product",
+      quantity: 3,
+    };
+    const updatedCart = await AddToCart(newRequest, mockRepository);
+
+    expect(updatedCart.items).toHaveLength(2);
+    expect(updatedCart.items).toContainEqual({
+      productId: "existing-product",
+      quantity: 1,
+    });
+    expect(updatedCart.items).toContainEqual({
+      productId: "new-product",
+      quantity: 3,
+    });
+  });
+
+  it("should increment quantity when adding existing product", async () => {
+    const existingCart = {
+      id: "cart-1",
+      userId: validRequest.userId,
+      items: [
+        {
+          productId: validRequest.productId,
+          quantity: 2,
+        },
+      ],
+    };
+    mockRepository.saveCart(existingCart);
+
+    const updatedCart = await AddToCart(validRequest, mockRepository);
+
+    expect(updatedCart.items).toHaveLength(1);
+
+    expect(updatedCart.items[0]).toEqual({
+      productId: validRequest.productId,
+      quantity: 4,
+    });
+  });
 });
