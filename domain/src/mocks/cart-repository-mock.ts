@@ -5,40 +5,20 @@ export interface MockedCartRepository extends CartRepository {
   carts: CartProps[];
 }
 
-export function mockCartRepository(
-  carts: CartProps[] = []
-): MockedCartRepository {
+export function mockCartRepository(): MockedCartRepository {
+  const carts: CartProps[] = [];
+
   return {
     carts,
-    findById: async (cartId: string): Promise<CartProps | null> => {
-      const cart = carts.find((cart) => cart.id === cartId);
-      const result = cart ? { ...cart, items: [...cart.items] } : null;
-      return result;
+    findCartByUserId(userId: string): CartProps | undefined {
+      return carts.find((cart) => cart.userId === userId);
     },
-    findByUserId: async (userId: string): Promise<CartProps | null> => {
-      const cart = carts.find((cart) => cart.userId === userId);
-      const result = cart ? { ...cart, items: [...cart.items] } : null;
-      return result;
-    },
-    save: async (cart: CartProps): Promise<CartProps> => {
-      const existingCartIndex = carts.findIndex((c) => c.id === cart.id);
-      const cartToSave = {
-        ...cart,
-        items: [...cart.items],
-        updatedAt: new Date(),
-      };
-
-      if (existingCartIndex !== -1) {
-        carts[existingCartIndex] = cartToSave;
+    saveCart(cart: CartProps): void {
+      const index = carts.findIndex((c) => c.id === cart.id);
+      if (index !== -1) {
+        carts[index] = cart;
       } else {
-        carts.push(cartToSave);
-      }
-      return { ...cartToSave };
-    },
-    delete: async (cartId: string): Promise<void> => {
-      const cartIndex = carts.findIndex((c) => c.id === cartId);
-      if (cartIndex !== -1) {
-        carts.splice(cartIndex, 1);
+        carts.push(cart);
       }
     },
   };
