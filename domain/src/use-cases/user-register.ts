@@ -1,3 +1,3 @@
-export function signUpUser() {
+export function UserRegister() {
   throw new Error("Not implemented");
 }
