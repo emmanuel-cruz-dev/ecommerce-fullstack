@@ -4,7 +4,6 @@ import {
   mockCartRepository,
   MockedCartRepository,
 } from "../mocks/cart-repository-mock";
-import { CartProps } from "../entities/Cart";
 
 describe("AddToCart Use Case", () => {
   let validRequest: AddToCartRequest;
