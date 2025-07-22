@@ -23,23 +23,30 @@ describe("UserRegister Use Case", async () => {
   });
 
   it("should register a valid user", async () => {
-    const user = UserRegister(validUser);
+    const user = await UserRegister(validUser, mockRepository);
     expect(user).toEqual(validUser);
+    expect(mockRepository.users).toHaveLength(1);
   });
 
   it("should throw an error if email is missing", async () => {
     const invalidUser = { ...validUser, email: "" };
-    expect(() => UserRegister(invalidUser)).toThrow("Email is required");
+    await expect(() =>
+      UserRegister(invalidUser, mockRepository)
+    ).rejects.toThrow("Email is required");
   });
 
   it("should throw an error if password is missing", async () => {
     const invalidUser = { ...validUser, password: "" };
-    expect(() => UserRegister(invalidUser)).toThrow("Password is required");
+    await expect(() =>
+      UserRegister(invalidUser, mockRepository)
+    ).rejects.toThrow("Password is required");
   });
 
   it("should throw an error if username is missing", async () => {
     const invalidUser = { ...validUser, username: "" };
-    expect(() => UserRegister(invalidUser)).toThrow("Username is required");
+    await expect(() =>
+      UserRegister(invalidUser, mockRepository)
+    ).rejects.toThrow("Username is required");
   });
 
   it("should fail if email is already in use", async () => {
