@@ -28,4 +28,55 @@ describe("CreateProduct Use Case", () => {
     expect(product).toEqual(product);
     expect(mockRepository.findById(product.id)).toEqual(product);
   });
+
+  it("should throw an error if name field is missing", () => {
+    const invalidProductData = {
+      id: "product-1",
+      name: "",
+      description: "A product for testing",
+      price: 19.99,
+      stock: 100,
+      category: "Test Category",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    expect(() => CreateProduct(invalidProductData, mockRepository)).toThrow(
+      "Name is required"
+    );
+  });
+
+  it("should throw an error if price is 0", () => {
+    const invalidProductData = {
+      id: "product-1",
+      name: "Product",
+      description: "A product for testing",
+      price: 0,
+      stock: 100,
+      category: "Test Category",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    expect(() => CreateProduct(invalidProductData, mockRepository)).toThrow(
+      "Price must be greater than 0"
+    );
+  });
+
+  it("should throw an error if stock is 0 or negative", () => {
+    const invalidProductData = {
+      id: "product-1",
+      name: "Product",
+      description: "A product for testing",
+      price: 100,
+      stock: -10,
+      category: "Test Category",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    expect(() => CreateProduct(invalidProductData, mockRepository)).toThrow(
+      "Stock cannot be 0 or negative"
+    );
+  });
 });
