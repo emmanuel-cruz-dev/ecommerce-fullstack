@@ -1,4 +1,5 @@
 import { UserProps } from "../entities/User";
+import { UserRepository } from "../repositories/user-repository";
 
 function validateData(email: string, password: string, username: string): void {
   if (email.trim() === "") {
@@ -12,8 +13,16 @@ function validateData(email: string, password: string, username: string): void {
   }
 }
 
-export function UserRegister(user: UserProps): UserProps {
+export async function UserRegister(
+  user: UserProps,
+  userRepository: UserRepository
+): Promise<UserProps> {
   validateData(user.email, user.password, user.username);
 
-  return user;
+  const existingUser = await userRepository.findByEmail(user.email);
+  if (existingUser) {
+    throw new Error("Email is already in use");
+  }
+
+  return await userRepository.save(user);
 }
