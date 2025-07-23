@@ -1,13 +1,13 @@
 {
   "name": "my-ecommerce",
   "version": "1.0.0",
-  "description": "",
+  "description": "E-commerce Fullstack",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Emmanuel Cruz",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
