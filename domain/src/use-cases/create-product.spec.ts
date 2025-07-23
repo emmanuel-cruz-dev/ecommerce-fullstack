@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { ProductRepository } from "../repositories/product-repository";
 import { mockProductRepository } from "../mocks/product-repository";
 import { CreateProduct } from "./create-product";
-import { ProductProps } from "../entities/Product";
+import { Product } from "../entities/Product";
 
 describe("CreateProduct Use Case", () => {
   let mockRepository: ProductRepository;
-  let validProduct: ProductProps;
+  let validProduct: Product;
 
   beforeEach(() => {
     mockRepository = mockProductRepository();
