@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { UserRegister } from "./user-register";
-import { UserProps } from "../entities/User";
+import { User } from "../entities/User";
 import {
   mockUserRepository,
   MockedUserRepository,
 } from "../mocks/user-repository-mock";
 
 describe("UserRegister Use Case", async () => {
-  let validUser: UserProps;
+  let validUser: User;
   let mockRepository: MockedUserRepository;
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe("UserRegister Use Case", async () => {
   });
 
   it("should fail if email is already in use", async () => {
-    const existingUser: UserProps = {
+    const existingUser: User = {
       id: "2",
       username: "existinguser",
       email: "test@example.com",
