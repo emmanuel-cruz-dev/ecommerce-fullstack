@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { ProductRepository } from "../repositories/product-repository";
-import { mockProductRepository } from "../mocks/product-repository";
+import { mockProductRepository } from "../mocks/product-repository-mock";
 import { CreateProduct } from "./create-product";
 import { Product } from "../entities/Product";
 
