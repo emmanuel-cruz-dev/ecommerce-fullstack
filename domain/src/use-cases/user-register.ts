@@ -1,4 +1,4 @@
-import { UserProps } from "../entities/User";
+import { User } from "../entities/User";
 import { UserRepository } from "../repositories/user-repository";
 
 function validateData(email: string, password: string, username: string): void {
@@ -14,9 +14,9 @@ function validateData(email: string, password: string, username: string): void {
 }
 
 export async function UserRegister(
-  user: UserProps,
+  user: User,
   userRepository: UserRepository
-): Promise<UserProps> {
+): Promise<User> {
   validateData(user.email, user.password, user.username);
 
   const existingUser = await userRepository.findByEmail(user.email);
