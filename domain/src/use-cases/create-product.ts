@@ -1,4 +1,4 @@
-import { ProductProps } from "../entities/Product";
+import { Product } from "../entities/Product";
 import { ProductRepository } from "../repositories/product-repository";
 
 function validateFields(name: string, price: number, stock: number): void {
@@ -14,9 +14,9 @@ function validateFields(name: string, price: number, stock: number): void {
 }
 
 export function CreateProduct(
-  productData: ProductProps,
+  productData: Product,
   repository: ProductRepository
-): ProductProps {
+): Product {
   validateFields(productData.name, productData.price, productData.stock);
 
   repository.save(productData);
