@@ -1,6 +1,6 @@
-import { ProductProps } from "../entities/Product";
+import { Product } from "../entities/Product";
 
 export interface ProductRepository {
-  save(product: ProductProps): void;
-  findById(id: string): ProductProps | undefined;
+  save(product: Product): void;
+  findById(id: string): Product | undefined;
 }
