@@ -1,6 +1,6 @@
-import { UserProps } from "../entities/User";
+import { User } from "../entities/User";
 
 export interface UserRepository {
-  findByEmail(email: string): Promise<UserProps | null>;
-  save(user: UserProps): Promise<UserProps>;
+  findByEmail(email: string): Promise<User | null>;
+  save(user: User): Promise<User>;
 }
