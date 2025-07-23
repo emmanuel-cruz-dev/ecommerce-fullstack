@@ -1,14 +1,14 @@
-import { ProductProps } from "../entities/Product";
+import { Product } from "../entities/Product";
 import { ProductRepository } from "../repositories/product-repository";
 
 export function mockProductRepository(): ProductRepository {
-  const products: ProductProps[] = [];
+  const products: Product[] = [];
 
   return {
-    save(product: ProductProps): void {
+    save(product: Product): void {
       products.push(product);
     },
-    findById(id: string): ProductProps | undefined {
+    findById(id: string): Product | undefined {
       return products.find((product) => product.id === id);
     },
   };
