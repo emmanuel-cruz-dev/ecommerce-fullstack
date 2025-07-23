@@ -1,7 +1,7 @@
-import { CartProps } from "../entities/Cart";
+import { Cart } from "../entities/Cart";
 
 export interface CartRepository {
-  carts: CartProps[];
-  findCartByUserId(userId: string): CartProps | undefined;
-  saveCart(cart: CartProps): void;
+  carts: Cart[];
+  findCartByUserId(userId: string): Cart | undefined;
+  saveCart(cart: Cart): void;
 }
