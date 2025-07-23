@@ -1,6 +1,17 @@
 import { Product } from "../entities/Product";
 import { ProductRepository } from "../repositories/product-repository";
 
+export function CreateProduct(
+  productData: Product,
+  repository: ProductRepository
+): Product {
+  validateFields(productData.name, productData.price, productData.stock);
+
+  repository.save(productData);
+
+  return productData;
+}
+
 function validateFields(name: string, price: number, stock: number): void {
   if (!name || name.trim() === "") {
     throw new Error("Name is required");
@@ -11,15 +22,4 @@ function validateFields(name: string, price: number, stock: number): void {
   if (stock < 0) {
     throw new Error("Stock cannot be 0 or negative");
   }
-}
-
-export function CreateProduct(
-  productData: Product,
-  repository: ProductRepository
-): Product {
-  validateFields(productData.name, productData.price, productData.stock);
-
-  repository.save(productData);
-
-  return productData;
 }

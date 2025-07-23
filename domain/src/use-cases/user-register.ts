@@ -1,18 +1,6 @@
 import { User } from "../entities/User";
 import { UserRepository } from "../repositories/user-repository";
 
-function validateData(email: string, password: string, username: string): void {
-  if (email.trim() === "") {
-    throw new Error("Email is required");
-  }
-  if (password.trim() === "") {
-    throw new Error("Password is required");
-  }
-  if (username.trim() === "") {
-    throw new Error("Username is required");
-  }
-}
-
 export async function UserRegister(
   user: User,
   userRepository: UserRepository
@@ -25,4 +13,16 @@ export async function UserRegister(
   }
 
   return await userRepository.save(user);
+}
+
+function validateData(email: string, password: string, username: string): void {
+  if (email.trim() === "") {
+    throw new Error("Email is required");
+  }
+  if (password.trim() === "") {
+    throw new Error("Password is required");
+  }
+  if (username.trim() === "") {
+    throw new Error("Username is required");
+  }
 }
