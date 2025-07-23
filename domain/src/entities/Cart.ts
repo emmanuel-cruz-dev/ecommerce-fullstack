@@ -1,10 +1,10 @@
-export interface CartProps {
+export interface Cart {
   id: string;
   userId: string;
-  items: CartItemProps[];
+  items: CartItem[];
 }
 
-export interface CartItemProps {
+export interface CartItem {
   productId: string;
   quantity: number;
 }
