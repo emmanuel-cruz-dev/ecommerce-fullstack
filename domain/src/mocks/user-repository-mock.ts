@@ -8,12 +8,12 @@ export interface MockedUserRepository extends UserRepository {
 export function mockUserRepository(users: User[] = []): MockedUserRepository {
   return {
     users,
-    findByEmail: async (email: string): Promise<User | null> => {
+    findByEmail: async (email: string) => {
       const user = users.find((user) => user.email === email);
       const result = user ? { ...user } : null;
       return result;
     },
-    save: async (user: User): Promise<User> => {
+    save: async (user: User) => {
       const existingUserIndex = users.findIndex((u) => u.email === user.email);
       if (existingUserIndex !== -1) {
         users[existingUserIndex] = { ...user };
