@@ -21,13 +21,41 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 ## 🏗️ Estructura del proyecto (Monorepo)
 
 ```
-mi-proyecto/
-├── domain/ # Lógica de negocio pura
-│ ├── entities/ # User, Product, Cart
-│ └── use-cases/ # Casos de uso (UserRegister, AddToCart, etc.)
-├── apps/
-│ ├── backend/ # API REST (Express)
-│ └── frontend/ # En desarrollo (React)
+📦 proyecto
+├── 📁 apps/
+│   ├── 📁 backend/
+│   └── 📁 frontend/
+├── 📁 domain/
+│   ├── 📁 src/
+│   │   ├── 📁 entities/
+│   │   │   ├── 📄 Cart.ts
+│   │   │   ├── 📄 Product.ts
+│   │   │   └── 📄 User.ts
+│   │   ├── 📁 repositories/
+│   │   │   ├── 📄 cart-repository.ts
+│   │   │   ├── 📄 product-repository.ts
+│   │   │   └── 📄 user-repository.ts
+│   │   └── 📁 use-cases/
+│   │       ├── 📄 add-to-cart.ts
+│   │       ├── 📄 create-product.ts
+│   │       └── 📄 user-register.ts
+│   ├── 📁 tests/
+│   │   ├── 📁 mocks/
+│   │   │   ├── 📄 cart-repository-mock.ts
+│   │   │   ├── 📄 product-repository-mock.ts
+│   │   │   └── 📄 user-repository-mock.ts
+│   │   └── 📁 use-cases/
+│   │       ├── 📄 add-to-cart.spec.ts
+│   │       ├── 📄 create-product.spec.ts
+│   │       └── 📄 user-register.spec.ts
+│   ├── 📄 package.json
+│   ├── 📄 package-lock.json
+│   └── ⚡ vitest.config.ts
+├── 📁 node_modules/
+├── 📄 .gitignore
+├── 📄 package.json
+├── 📄 package-lock.json
+└── 📄 README.md
 ```
 
 ---
