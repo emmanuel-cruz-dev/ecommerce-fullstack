@@ -9,10 +9,6 @@ describe("CreateProduct Use Case", () => {
   let validProduct: Product;
 
   beforeEach(() => {
-    mockRepository = mockProductRepository();
-  });
-
-  test("should create a product successfully", () => {
     validProduct = {
       id: "1",
       name: "Remera",
@@ -23,59 +19,48 @@ describe("CreateProduct Use Case", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
+    mockRepository = mockProductRepository();
+  });
+
+  test("should create a product successfully", () => {
     const product = CreateProduct(validProduct, mockRepository);
 
     expect(product).toEqual(product);
+    expect(product.id).toEqual(validProduct.id);
+    expect(product.name).toEqual(validProduct.name);
+    expect(product.description).toEqual(validProduct.description);
     expect(mockRepository.findById(product.id)).toEqual(product);
   });
 
   test("should throw an error if name field is missing", () => {
-    const invalidProductData = {
-      id: "product-1",
-      name: "",
-      description: "A product for testing",
-      price: 19.99,
-      stock: 100,
-      category: "Test Category",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    validProduct.name = "";
 
-    expect(() => CreateProduct(invalidProductData, mockRepository)).toThrow(
+    expect(() => CreateProduct(validProduct, mockRepository)).toThrow(
       "Name is required"
     );
   });
 
-  test("should throw an error if price is 0", () => {
-    const invalidProductData = {
-      id: "product-1",
-      name: "Product",
-      description: "A product for testing",
-      price: 0,
-      stock: 100,
-      category: "Test Category",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  test("should throw an error if description field is missing", () => {
+    validProduct.description = "";
 
-    expect(() => CreateProduct(invalidProductData, mockRepository)).toThrow(
+    expect(() => CreateProduct(validProduct, mockRepository)).toThrow(
+      "Description is required"
+    );
+  });
+
+  test("should throw an error if price is 0", () => {
+    validProduct.price = 0;
+
+    expect(() => CreateProduct(validProduct, mockRepository)).toThrow(
       "Price must be greater than 0"
     );
   });
 
   test("should throw an error if stock is 0 or negative", () => {
-    const invalidProductData = {
-      id: "product-1",
-      name: "Product",
-      description: "A product for testing",
-      price: 100,
-      stock: -10,
-      category: "Test Category",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    validProduct.stock = -10;
 
-    expect(() => CreateProduct(invalidProductData, mockRepository)).toThrow(
+    expect(() => CreateProduct(validProduct, mockRepository)).toThrow(
       "Stock cannot be 0 or negative"
     );
   });
