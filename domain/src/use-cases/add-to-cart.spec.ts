@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { AddToCart, AddToCartRequest } from "./add-to-cart";
 import {
   mockCartRepository,
@@ -21,7 +21,7 @@ describe("AddToCart Use Case", () => {
     mockRepository = mockCartRepository();
   });
 
-  it("should create a new cart when user has no existing cart", async () => {
+  test("should create a new cart when user has no existing cart", async () => {
     const cart = await AddToCart(validRequest, mockRepository);
 
     expect(cart.userId).toBe(validRequest.userId);
@@ -33,42 +33,42 @@ describe("AddToCart Use Case", () => {
     expect(mockRepository.carts).toHaveLength(1);
   });
 
-  it("should throw an error if userId is missing", async () => {
+  test("should throw an error if userId is missing", async () => {
     const invalidRequest = { ...validRequest, userId: "" };
     await expect(() =>
       AddToCart(invalidRequest, mockRepository)
     ).rejects.toThrow("User ID is required");
   });
 
-  it("should throw an error if productId is missing", async () => {
+  test("should throw an error if productId is missing", async () => {
     const invalidRequest = { ...validRequest, productId: "" };
     await expect(() =>
       AddToCart(invalidRequest, mockRepository)
     ).rejects.toThrow("Product ID is required");
   });
 
-  it("should throw an error if productName is missing", async () => {
+  test("should throw an error if productName is missing", async () => {
     const invalidRequest = { ...validRequest, productName: "" };
     await expect(() =>
       AddToCart(invalidRequest, mockRepository)
     ).rejects.toThrow("Product name is required");
   });
 
-  it("should throw an error if productPrice is missing", async () => {
+  test("should throw an error if productPrice is missing", async () => {
     const invalidRequest = { ...validRequest, productPrice: "" };
     await expect(() =>
       AddToCart(invalidRequest, mockRepository)
     ).rejects.toThrow("Product price is required");
   });
 
-  it("should throw an error if quantity is zero or negative", async () => {
+  test("should throw an error if quantity is zero or negative", async () => {
     const invalidRequest = { ...validRequest, quantity: 0 };
     await expect(() =>
       AddToCart(invalidRequest, mockRepository)
     ).rejects.toThrow("Quantity must be greater than 0");
   });
 
-  it("should add new item to existing cart", async () => {
+  test("should add new item to existing cart", async () => {
     const existingCart = {
       id: "cart-1",
       userId: validRequest.userId,
@@ -99,7 +99,7 @@ describe("AddToCart Use Case", () => {
     });
   });
 
-  it("should increment quantity when adding existing product", async () => {
+  test("should increment quantity when adding existing product", async () => {
     const existingCart = {
       id: "cart-1",
       userId: validRequest.userId,
