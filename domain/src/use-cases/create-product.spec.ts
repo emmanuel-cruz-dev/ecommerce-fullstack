@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { ProductRepository } from "../repositories/product-repository";
 import { mockProductRepository } from "../mocks/product-repository-mock";
 import { CreateProduct } from "./create-product";
@@ -12,7 +12,7 @@ describe("CreateProduct Use Case", () => {
     mockRepository = mockProductRepository();
   });
 
-  it("should create a product successfully", () => {
+  test("should create a product successfully", () => {
     validProduct = {
       id: "1",
       name: "Remera",
@@ -29,7 +29,7 @@ describe("CreateProduct Use Case", () => {
     expect(mockRepository.findById(product.id)).toEqual(product);
   });
 
-  it("should throw an error if name field is missing", () => {
+  test("should throw an error if name field is missing", () => {
     const invalidProductData = {
       id: "product-1",
       name: "",
@@ -46,7 +46,7 @@ describe("CreateProduct Use Case", () => {
     );
   });
 
-  it("should throw an error if price is 0", () => {
+  test("should throw an error if price is 0", () => {
     const invalidProductData = {
       id: "product-1",
       name: "Product",
@@ -63,7 +63,7 @@ describe("CreateProduct Use Case", () => {
     );
   });
 
-  it("should throw an error if stock is 0 or negative", () => {
+  test("should throw an error if stock is 0 or negative", () => {
     const invalidProductData = {
       id: "product-1",
       name: "Product",
