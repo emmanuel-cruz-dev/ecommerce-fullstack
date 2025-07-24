@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, test, expect, beforeEach } from "vitest";
 import { UserRegister } from "./user-register";
 import { User } from "../entities/User";
 import {
@@ -22,34 +22,34 @@ describe("UserRegister Use Case", async () => {
     mockRepository = mockUserRepository();
   });
 
-  it("should register a valid user", async () => {
+  test("should register a valid user", async () => {
     const user = await UserRegister(validUser, mockRepository);
     expect(user).toEqual(validUser);
     expect(mockRepository.users).toHaveLength(1);
   });
 
-  it("should throw an error if email is missing", async () => {
+  test("should throw an error if email is missing", async () => {
     const invalidUser = { ...validUser, email: "" };
     await expect(() =>
       UserRegister(invalidUser, mockRepository)
     ).rejects.toThrow("Email is required");
   });
 
-  it("should throw an error if password is missing", async () => {
+  test("should throw an error if password is missing", async () => {
     const invalidUser = { ...validUser, password: "" };
     await expect(() =>
       UserRegister(invalidUser, mockRepository)
     ).rejects.toThrow("Password is required");
   });
 
-  it("should throw an error if username is missing", async () => {
+  test("should throw an error if username is missing", async () => {
     const invalidUser = { ...validUser, username: "" };
     await expect(() =>
       UserRegister(invalidUser, mockRepository)
     ).rejects.toThrow("Username is required");
   });
 
-  it("should fail if email is already in use", async () => {
+  test("should fail if email is already in use", async () => {
     const existingUser: User = {
       id: "2",
       username: "existinguser",
