@@ -62,13 +62,12 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 
 ## 🔧 Tecnologías clave
 
-| Área          | Tecnologías                                   |
-| ------------- | --------------------------------------------- |
-| Backend       | Node.js, Express, TypeScript, JWT             |
-| Dominio       | Arquitectura limpia, TDD                      |
-| Frontend      | React, TypeScript, TailwindCSS (Próximamente) |
-| Base de datos | MongoDB/PostgreSQL (Implementación futura)    |
-| Herramientas  | Git, GitHub, Postman, Vitest (Testing)        |
+| Área         | Tecnologías                                   |
+| ------------ | --------------------------------------------- |
+| Backend      | Node.js, Express, TypeScript, JWT             |
+| Dominio      | Arquitectura limpia, TDD                      |
+| Frontend     | React, TypeScript, TailwindCSS (Próximamente) |
+| Herramientas | Git, GitHub, Postman, Vitest (Testing)        |
 
 ---
 
