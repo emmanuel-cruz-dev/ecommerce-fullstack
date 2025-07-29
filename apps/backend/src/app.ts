@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 
 const app = express();
 
@@ -11,6 +11,23 @@ app.get("/", (req, res) => {
   res.json({
     ok: true,
     message: "API RESTful TypeScript & Express",
+  });
+});
+
+// Not found (404)
+app.use((req, res) => {
+  res.status(404).json({
+    ok: false,
+    message: `No se encontró la ruta '${req.originalUrl}'`,
+  });
+});
+
+// General error handling
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({
+    ok: false,
+    message: "Error interno del servidor",
   });
 });
 
