@@ -48,7 +48,7 @@ const updateProduct = async (req: Request, res: Response) => {
     if (!updatedProduct) {
       return res
         .status(404)
-        .json({ error: `Producto con ID '${id}' no encontrado` });
+        .json({ ok: false, error: `Producto con ID '${id}' no encontrado` });
     }
 
     res.status(200).json({ ok: true, payload: updatedProduct });
@@ -57,7 +57,23 @@ const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
-const deleteProduct = (req: Request, res: Response) => {};
+const deleteProduct = async (req: Request, res: Response) => {
+  const id = req.params.productId;
+
+  try {
+    const deletedProduct = await productService.deleteProduct(id);
+
+    if (!deletedProduct) {
+      return res
+        .status(404)
+        .json({ ok: false, error: `Producto con ID '${id}' no encontrado` });
+    }
+
+    res.status(200).json({ ok: true, payload: deletedProduct });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
 
 export default {
   getAllProducts,
