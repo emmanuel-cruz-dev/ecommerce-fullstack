@@ -1,19 +1,13 @@
 import { Request, Response } from "express";
-import { HttpError } from "src/errors/error";
+import { handleError } from "src/errors/error";
 import productService from "src/services/product.service";
 
 const getAllProducts = async (req: Request, res: Response) => {
   try {
     const products = await productService.getAllProducts();
     res.status(200).json({ ok: true, payload: products });
-  } catch (error: unknown) {
-    if (error instanceof HttpError) {
-      res.status(error.status).json({ ok: false, message: error.message });
-    } else {
-      res
-        .status(500)
-        .json({ ok: false, message: "Error interno del servidor" });
-    }
+  } catch (error) {
+    return handleError(res, error);
   }
 };
 
@@ -30,18 +24,21 @@ const getProductById = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ ok: true, payload: product });
-  } catch (error: unknown) {
-    if (error instanceof HttpError) {
-      res.status(error.status).json({ ok: false, message: error.message });
-    } else {
-      res
-        .status(500)
-        .json({ ok: false, message: "Error interno del servidor" });
-    }
+  } catch (error) {
+    return handleError(res, error);
   }
 };
 
-const createProduct = (req: Request, res: Response) => {};
+const createProduct = async (req: Request, res: Response) => {
+  try {
+    const newProduct = await productService.createProduct(req.body);
+
+    res.status(201).json({ ok: true, payload: newProduct });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 const updateProduct = (req: Request, res: Response) => {};
 const deleteProduct = (req: Request, res: Response) => {};
 
