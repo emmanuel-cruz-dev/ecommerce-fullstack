@@ -39,7 +39,24 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-const updateProduct = (req: Request, res: Response) => {};
+const updateProduct = async (req: Request, res: Response) => {
+  const id = req.params.productId;
+
+  try {
+    const updatedProduct = await productService.updateProduct(id, req.body);
+
+    if (!updatedProduct) {
+      return res
+        .status(404)
+        .json({ error: `Producto con ID '${id}' no encontrado` });
+    }
+
+    res.status(200).json({ ok: true, payload: updatedProduct });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 const deleteProduct = (req: Request, res: Response) => {};
 
 export default {
