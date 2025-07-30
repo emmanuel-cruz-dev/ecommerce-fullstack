@@ -41,9 +41,10 @@ const createProduct = async (req: Request, res: Response) => {
 
 const updateProduct = async (req: Request, res: Response) => {
   const id = req.params.productId;
+  const updates = req.body;
 
   try {
-    const updatedProduct = await productService.updateProduct(id, req.body);
+    const updatedProduct = await productService.updateProduct(id, updates);
 
     if (!updatedProduct) {
       return res
