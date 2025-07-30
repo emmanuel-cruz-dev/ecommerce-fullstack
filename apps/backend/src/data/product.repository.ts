@@ -14,13 +14,22 @@ const save = async (product: Product) => {
   const existingIndex = productsDB.findIndex((prod) => prod.id === product.id);
 
   if (existingIndex >= 0) {
-    productsDB[existingIndex] = product;
+    const updatedProduct = {
+      ...product,
+      updatedAt: new Date(),
+    };
+    productsDB[existingIndex] = updatedProduct;
+    return updatedProduct;
   } else {
-    const newProduct = { ...product, id: "prod-004" };
+    const newProduct = {
+      ...product,
+      id: uuid(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
     productsDB.push(newProduct);
     return newProduct;
   }
-  return product;
 };
 
 const updateById = async (
