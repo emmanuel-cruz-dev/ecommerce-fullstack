@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { handleError } from "src/errors/error";
-import productService from "src/services/product.service";
+import productService from "../services/product.service";
+import { handleError } from "../errors/error";
 
 const getAllProducts = async (req: Request, res: Response) => {
   try {
@@ -39,23 +39,23 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-const updateProduct = async (req: Request, res: Response) => {
-  const id = req.params.productId;
+// const updateProduct = async (req: Request, res: Response) => {
+//   const id = req.params.productId;
 
-  try {
-    const updatedProduct = await productService.updateProduct(id, req.body);
+//   try {
+//     const updatedProduct = await productService.updateProduct(id, req.body);
 
-    if (!updatedProduct) {
-      return res
-        .status(404)
-        .json({ ok: false, error: `Producto con ID '${id}' no encontrado` });
-    }
+//     if (!updatedProduct) {
+//       return res
+//         .status(404)
+//         .json({ ok: false, error: `Producto con ID '${id}' no encontrado` });
+//     }
 
-    res.status(200).json({ ok: true, payload: updatedProduct });
-  } catch (error) {
-    return handleError(res, error);
-  }
-};
+//     res.status(200).json({ ok: true, payload: updatedProduct });
+//   } catch (error) {
+//     return handleError(res, error);
+//   }
+// };
 
 const deleteProduct = async (req: Request, res: Response) => {
   const id = req.params.productId;
@@ -79,6 +79,6 @@ export default {
   getAllProducts,
   getProductById,
   createProduct,
-  updateProduct,
+  //updateProduct,
   deleteProduct,
 };
