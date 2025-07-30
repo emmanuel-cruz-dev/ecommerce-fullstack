@@ -18,7 +18,7 @@ const createProduct = async (product: Product) => {
 // };
 
 const deleteProduct = async (productId: string) => {
-  return productId;
+  return await productRepository.deleteById(productId);
 };
 
 export default {
