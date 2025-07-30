@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid } from "uuid";
 import { Product } from "@domain/src/entities/Product";
 import { productsDB } from "../database/products.db";
 
@@ -23,6 +23,26 @@ const save = async (product: Product) => {
   return product;
 };
 
+const updateById = async (
+  id: string,
+  updates: Partial<Omit<Product, "id" | "createdAt">>
+): Promise<Product | null> => {
+  const existingIndex = productsDB.findIndex((prod) => prod.id === id);
+
+  if (existingIndex === -1) {
+    return null;
+  }
+
+  const updatedProduct: Product = {
+    ...productsDB[existingIndex],
+    ...updates,
+    updatedAt: new Date(),
+  };
+
+  productsDB[existingIndex] = updatedProduct;
+  return updatedProduct;
+};
+
 const deleteById = async (id: string) => {
   const indexToDelete = productsDB.findIndex((prod) => prod.id === id);
 
@@ -38,5 +58,6 @@ export default {
   getAllProducts,
   findById,
   save,
+  updateById,
   deleteById,
 };
