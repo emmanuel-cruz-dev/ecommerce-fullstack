@@ -5,7 +5,7 @@ const getAllProducts = async () => {
 };
 
 const getProductById = async (productId: string) => {
-  return productId;
+  return await productRepository.findById(productId);
 };
 
 const createProduct = async (product: string) => {};
