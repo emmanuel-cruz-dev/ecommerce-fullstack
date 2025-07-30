@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
+import productRoutes from "./routes/product.routes";
 
 const app = express();
 
@@ -13,6 +14,9 @@ app.get("/", (req, res) => {
     message: "API RESTful TypeScript & Express",
   });
 });
+
+// Routes
+app.use("/api/products", productRoutes);
 
 // Not found (404)
 app.use((req, res) => {
