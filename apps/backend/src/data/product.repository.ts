@@ -1,8 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
 import { Product } from "@domain/src/entities/Product";
 import { productsDB } from "../database/products.db";
 
 const getAllProducts = async () => {
-  return productsDB;
+  return [...productsDB];
 };
 
 const findById = async (id: string) => {
@@ -22,8 +23,20 @@ const save = async (product: Product) => {
   return product;
 };
 
+const deleteById = async (id: string) => {
+  const indexToDelete = productsDB.findIndex((prod) => prod.id === id);
+
+  if (indexToDelete !== -1) {
+    productsDB.splice(indexToDelete, 1);
+    return true;
+  }
+
+  return false;
+};
+
 export default {
   getAllProducts,
   findById,
   save,
+  deleteById,
 };
