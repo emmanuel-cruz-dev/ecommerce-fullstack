@@ -88,4 +88,36 @@ describe("Product Repository", () => {
     expect(updatedProduct?.updatedAt).toBeInstanceOf(Date);
     expect(productsDB[0]).toEqual(updatedProduct);
   });
+
+  test("should return null when trying to update a non-existent product", async () => {
+    const updates = { name: "Updated Name" };
+    const updatedProduct = await productRepository.updateById(
+      "non-existent",
+      updates
+    );
+    expect(updatedProduct).toBeNull();
+  });
+
+  test("should delete a product by ID and return true", async () => {
+    const product: Product = {
+      id: "123",
+      name: "Product to Delete",
+      description: "Desc",
+      price: 10,
+      stock: 1,
+      category: "Cat",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    productsDB.push(product);
+
+    const result = await productRepository.deleteById("123");
+    expect(result).toBe(true);
+    expect(productsDB).not.toContainEqual(product);
+  });
+
+  test("should return false when trying to delete a non-existent product", async () => {
+    const result = await productRepository.deleteById("non-existent");
+    expect(result).toBe(false);
+  });
 });
