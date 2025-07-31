@@ -1,21 +1,36 @@
 import { User } from "../entities/User";
 import { UserRepository } from "../repositories/user-repository";
+import { IPasswordHasher } from "../ports/password-hasher";
 
 export async function UserRegister(
   user: User,
-  userRepository: UserRepository
+  userRepository: UserRepository,
+  passwordHasher: IPasswordHasher
 ): Promise<User> {
-  validateData(user.email, user.password, user.username);
+  if (!user.id) {
+    user.id =
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
+  }
+
+  validateUserData(user.email, user.password, user.username);
 
   const existingUser = await userRepository.findByEmail(user.email);
   if (existingUser) {
     throw new Error("Email is already in use");
   }
 
-  return await userRepository.save(user);
+  const hashedPassword = await passwordHasher.hash(user.password);
+  const newUser = { ...user, password: hashedPassword };
+
+  return await userRepository.save(newUser);
 }
 
-function validateData(email: string, password: string, username: string): void {
+function validateUserData(
+  email: string,
+  password: string,
+  username: string
+): void {
   if (email.trim() === "") {
     throw new Error("Email is required");
   }
