@@ -109,4 +109,22 @@ describe("Product Service", () => {
       );
     });
   });
+
+  describe("deleteProduct", () => {
+    test("should delete a product and return true", async () => {
+      vi.mocked(productRepository.deleteById).mockResolvedValue(true);
+
+      const result = await productService.deleteProduct("1");
+      expect(result).toBe(true);
+      expect(productRepository.deleteById).toHaveBeenCalledWith("1");
+    });
+
+    test("should return false if product to delete is not found", async () => {
+      vi.mocked(productRepository.deleteById).mockResolvedValue(false);
+
+      const result = await productService.deleteProduct("non-existent");
+      expect(result).toBe(false);
+      expect(productRepository.deleteById).toHaveBeenCalledWith("non-existent");
+    });
+  });
 });
