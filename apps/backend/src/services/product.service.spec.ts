@@ -57,7 +57,7 @@ describe("Product Service", () => {
   });
 
   describe("createProduct", () => {
-    it("should create a new product and return it", async () => {
+    test("should create a new product and return it", async () => {
       const newProductData: Omit<Product, "id" | "createdAt" | "updatedAt"> = {
         name: "New Product",
         description: "New Description",
@@ -81,6 +81,31 @@ describe("Product Service", () => {
       expect(result).toEqual(createdProduct);
       expect(productRepository.save).toHaveBeenCalledWith(
         expect.objectContaining(newProductData)
+      );
+    });
+  });
+
+  describe("updateProduct", () => {
+    test("should update an existing product and return it", async () => {
+      const updates = { name: "Updated Name", price: 120 };
+      const updatedProduct = { ...mockProduct, ...updates } as Product;
+      vi.mocked(productRepository.updateById).mockResolvedValue(updatedProduct);
+
+      const result = await productService.updateProduct("1", updates);
+      expect(result).toEqual(updatedProduct);
+      expect(productRepository.updateById).toHaveBeenCalledWith("1", updates);
+    });
+
+    test("should return null if product to update is not found", async () => {
+      vi.mocked(productRepository.updateById).mockResolvedValue(null);
+
+      const result = await productService.updateProduct("non-existent", {
+        name: "test",
+      });
+      expect(result).toBeNull();
+      expect(productRepository.updateById).toHaveBeenCalledWith(
+        "non-existent",
+        { name: "test" }
       );
     });
   });
