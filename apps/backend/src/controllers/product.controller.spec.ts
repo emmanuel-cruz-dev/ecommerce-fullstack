@@ -92,6 +92,48 @@ describe("Product Controller", () => {
     });
   });
 
+  describe("POST /api/products", () => {
+    const newProductData = {
+      name: "New Item",
+      description: "Description of new item",
+      price: 200,
+      stock: 20,
+      category: "Category of new item",
+    };
+
+    test("should return 201 and the created product", async () => {
+      const createdProduct = {
+        ...newProductData,
+        id: "3",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      vi.mocked(productService.createProduct).mockResolvedValue(createdProduct);
+
+      const res = await request(app).post("/api/products").send(newProductData);
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.payload).toEqual(createdProduct);
+      expect(productService.createProduct).toHaveBeenCalledWith(
+        expect.objectContaining(newProductData)
+      );
+    });
+
+    test("should return 500 if an error occurs", async () => {
+      vi.mocked(productService.createProduct).mockRejectedValue(
+        new Error("Validation error")
+      );
+
+      const res = await request(app).post("/api/products").send(newProductData);
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe("Error interno del servidor");
+    });
+  });
+
   describe("PUT /api/products/:productId", () => {
     const updates = { name: "Updated Name", price: 150 };
 
