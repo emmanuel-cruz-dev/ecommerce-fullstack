@@ -4,7 +4,7 @@
     "target": "es2016",
     "module": "commonjs",
     "moduleResolution": "node",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
         "@domain/*": ["../../domain/*"]
     },
