@@ -55,4 +55,33 @@ describe("Product Service", () => {
       expect(productRepository.findById).toHaveBeenCalledWith("non-existent");
     });
   });
+
+  describe("createProduct", () => {
+    it("should create a new product and return it", async () => {
+      const newProductData: Omit<Product, "id" | "createdAt" | "updatedAt"> = {
+        name: "New Product",
+        description: "New Description",
+        price: 50,
+        stock: 5,
+        category: "New Category",
+      };
+
+      const createdProduct = {
+        ...newProductData,
+        id: "3",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Product;
+
+      vi.mocked(productRepository.save).mockResolvedValue(createdProduct);
+
+      const result = await productService.createProduct(
+        newProductData as Product
+      );
+      expect(result).toEqual(createdProduct);
+      expect(productRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining(newProductData)
+      );
+    });
+  });
 });
