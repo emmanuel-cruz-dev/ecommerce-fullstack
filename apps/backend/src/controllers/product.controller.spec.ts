@@ -18,7 +18,9 @@ describe("Product Controller", () => {
     price: 100,
     stock: 10,
     category: "Category",
+    // @ts-ignore
     createdAt: new Date().toISOString(),
+    // @ts-ignore
     updatedAt: new Date().toISOString(),
   };
 
@@ -102,12 +104,13 @@ describe("Product Controller", () => {
     };
 
     test("should return 201 and the created product", async () => {
+      // @ts-ignore
       const createdProduct = {
         ...newProductData,
         id: "3",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      };
+      } as Product;
 
       vi.mocked(productService.createProduct).mockResolvedValue(createdProduct);
 
