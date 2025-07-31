@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
   test: {
@@ -10,5 +11,10 @@ export default defineConfig({
     },
     include: ["**/*.spec.ts"],
     exclude: ["node_modules", "dist"],
+  },
+  resolve: {
+    alias: {
+      "@domain": path.resolve(__dirname, "../../domain"),
+    },
   },
 });
