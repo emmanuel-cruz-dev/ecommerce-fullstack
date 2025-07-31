@@ -137,4 +137,42 @@ describe("Product Controller", () => {
       expect(res.body.message).toBe("Error interno del servidor");
     });
   });
+
+  describe("DELETE /api/products/:productId", () => {
+    test("should return 200 and success message if product deleted", async () => {
+      vi.mocked(productService.deleteProduct).mockResolvedValue(true);
+
+      const res = await request(app).delete("/api/products/1");
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.payload).toBe(true);
+      expect(productService.deleteProduct).toHaveBeenCalledWith("1");
+    });
+
+    test("should return 404 if product to delete is not found", async () => {
+      vi.mocked(productService.deleteProduct).mockResolvedValue(false);
+
+      const res = await request(app).delete("/api/products/non-existent");
+
+      expect(res.statusCode).toEqual(404);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.error).toBe(
+        "Producto con ID 'non-existent' no encontrado"
+      );
+      expect(productService.deleteProduct).toHaveBeenCalledWith("non-existent");
+    });
+
+    test("should return 500 if an error occurs", async () => {
+      vi.mocked(productService.deleteProduct).mockRejectedValue(
+        new Error("Delete error")
+      );
+
+      const res = await request(app).delete("/api/products/1");
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe("Error interno del servidor");
+    });
+  });
 });
