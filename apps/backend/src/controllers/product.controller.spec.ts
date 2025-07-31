@@ -18,8 +18,8 @@ describe("Product Controller", () => {
     price: 100,
     stock: 10,
     category: "Category",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   const mockProducts: Product[] = [
@@ -35,24 +35,7 @@ describe("Product Controller", () => {
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.ok).toBe(true);
-      expect(res.body.payload).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: "1",
-            name: "Test Product",
-            description: "Description",
-            price: 100,
-            stock: 10,
-            category: "Category",
-            createdAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-            ),
-            updatedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-            ),
-          }),
-        ])
-      );
+      expect(res.body.payload).toEqual(mockProducts);
       expect(productService.getAllProducts).toHaveBeenCalledTimes(1);
     });
 
@@ -66,6 +49,19 @@ describe("Product Controller", () => {
       expect(res.statusCode).toEqual(500);
       expect(res.body.ok).toBe(false);
       expect(res.body.message).toBe("Error interno del servidor");
+    });
+  });
+
+  describe("GET /api/products/:productId", () => {
+    test("should return 200 and the product if found", async () => {
+      vi.mocked(productService.getProductById).mockResolvedValue(mockProduct);
+
+      const res = await request(app).get("/api/products/1");
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.payload).toEqual(mockProduct);
+      expect(productService.getProductById).toHaveBeenCalledWith("1");
     });
   });
 });
