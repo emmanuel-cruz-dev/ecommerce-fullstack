@@ -37,4 +37,22 @@ describe("Product Service", () => {
       expect(productRepository.getAllProducts).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe("getProductById", () => {
+    test("should return a product if found by ID", async () => {
+      vi.mocked(productRepository.findById).mockResolvedValue(mockProduct);
+
+      const product = await productService.getProductById("1");
+      expect(product).toEqual(mockProduct);
+      expect(productRepository.findById).toHaveBeenCalledWith("1");
+    });
+
+    test("should return null if product not found by ID", async () => {
+      vi.mocked(productRepository.findById).mockResolvedValue(null);
+
+      const product = await productService.getProductById("non-existent");
+      expect(product).toBeNull();
+      expect(productRepository.findById).toHaveBeenCalledWith("non-existent");
+    });
+  });
 });
