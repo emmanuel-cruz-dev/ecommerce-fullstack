@@ -63,5 +63,32 @@ describe("Product Controller", () => {
       expect(res.body.payload).toEqual(mockProduct);
       expect(productService.getProductById).toHaveBeenCalledWith("1");
     });
+
+    test("should return 404 if product not found", async () => {
+      vi.mocked(productService.getProductById).mockResolvedValue(null);
+
+      const res = await request(app).get("/api/products/non-existent");
+
+      expect(res.statusCode).toEqual(404);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe(
+        "Producto con ID 'non-existent' no encontrado"
+      );
+      expect(productService.getProductById).toHaveBeenCalledWith(
+        "non-existent"
+      );
+    });
+
+    test("should return 500 if an error occurs", async () => {
+      vi.mocked(productService.getProductById).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const res = await request(app).get("/api/products/1");
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe("Error interno del servidor");
+    });
   });
 });
