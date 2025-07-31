@@ -91,4 +91,50 @@ describe("Product Controller", () => {
       expect(res.body.message).toBe("Error interno del servidor");
     });
   });
+
+  describe("PUT /api/products/:productId", () => {
+    const updates = { name: "Updated Name", price: 150 };
+
+    test("should return 200 and the updated product", async () => {
+      const updatedProduct = { ...mockProduct, ...updates } as Product;
+      vi.mocked(productService.updateProduct).mockResolvedValue(updatedProduct);
+
+      const res = await request(app).put("/api/products/1").send(updates);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.payload).toEqual(updatedProduct);
+      expect(productService.updateProduct).toHaveBeenCalledWith("1", updates);
+    });
+
+    test("should return 404 if product to update is not found", async () => {
+      vi.mocked(productService.updateProduct).mockResolvedValue(null);
+
+      const res = await request(app)
+        .put("/api/products/non-existent")
+        .send(updates);
+
+      expect(res.statusCode).toEqual(404);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.error).toBe(
+        "Producto con ID 'non-existent' no encontrado"
+      );
+      expect(productService.updateProduct).toHaveBeenCalledWith(
+        "non-existent",
+        updates
+      );
+    });
+
+    test("should return 500 if an error occurs", async () => {
+      vi.mocked(productService.updateProduct).mockRejectedValue(
+        new Error("Update error")
+      );
+
+      const res = await request(app).put("/api/products/1").send(updates);
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe("Error interno del servidor");
+    });
+  });
 });
