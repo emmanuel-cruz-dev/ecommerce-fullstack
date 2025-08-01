@@ -1,14 +1,14 @@
 import { Router } from "express";
 import cartController from "../controllers/cart.controller";
-import { authenticate, authorize } from "../middlewares/auth.middleware";
+import { authenticate } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-router.post(
-  "/",
-  authenticate,
-  authorize(["user", "admin"]),
-  cartController.addToCart
-);
+router.use(authenticate);
+router
+  .post("/", cartController.addToCart)
+  .get("/", cartController.getCartContent)
+  .delete("/", cartController.clearCart)
+  .delete("/:productId", cartController.removeFromCart);
 
 export default router;
