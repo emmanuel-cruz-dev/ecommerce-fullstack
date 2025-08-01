@@ -11,12 +11,14 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "vitest": "^3.2.4"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2"
   }
 }
