@@ -21,5 +21,27 @@ export function mockCartRepository(): MockedCartRepository {
         carts.push(cart);
       }
     },
+    clearCart(userId: string): boolean {
+      const index = carts.findIndex((cart) => cart.userId === userId);
+      if (index !== -1) {
+        carts.splice(index, 1);
+        return true;
+      }
+      return false;
+    },
+
+    removeCartItem(userId: string, productId: string): boolean {
+      const cart = carts.find((c) => c.userId === userId);
+      if (cart) {
+        const itemIndex = cart.items.findIndex(
+          (item) => item.productId === productId
+        );
+        if (itemIndex !== -1) {
+          cart.items.splice(itemIndex, 1);
+          return true;
+        }
+      }
+      return false;
+    },
   };
 }
