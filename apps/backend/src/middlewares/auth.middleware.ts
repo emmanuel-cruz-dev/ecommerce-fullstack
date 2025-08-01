@@ -1,61 +1,62 @@
 import { Request, Response, NextFunction } from "express";
-import { ITokenService } from "@domain/src/ports/token-service";
-import { UserRole } from "@domain/src/entities/User";
-import { JwtTokenService } from "@domain/src/infrastructure/security/jwt-token-service";
-import { AuthenticatedUser } from "@domain/src/ports/auth-types";
+import jwt from "jsonwebtoken";
+import userRepository from "../data/user.repository";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: AuthenticatedUser;
-    }
-  }
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    username: string;
+    role: string;
+  };
 }
 
-export const tokenService: ITokenService = new JwtTokenService(
-  process.env.JWT_SECRET || "default-secret-for-dev"
-);
-
-export const authenticate = (
-  req: Request,
+export const authenticate = async (
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res
-      .status(401)
-      .json({ ok: false, message: "No authentication token provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
-  const decodedUser = tokenService.verifyToken(token);
-
-  if (!decodedUser) {
-    return res
-      .status(403)
-      .json({ ok: false, message: "Invalid or expired token" });
-  }
-
-  req.user = decodedUser;
-  next();
-};
-
-export const authorize = (requiredRoles: UserRole[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
       return res
         .status(401)
-        .json({ ok: false, message: "Authentication required" });
+        .json({ ok: false, message: "No authentication token provided" });
     }
 
-    if (!requiredRoles.includes(req.user.role)) {
+    const payload = jwt.verify(token, JWT_SECRET) as { id: string };
+    const user = await userRepository.findById(payload.id);
+
+    if (!user) {
       return res
-        .status(403)
-        .json({ ok: false, message: "Forbidden: Insufficient permissions" });
+        .status(401)
+        .json({ ok: false, message: "Authentication failed" });
     }
 
+    req.user = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
+    next();
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ ok: false, message: "Authentication failed" });
+  }
+};
+
+export const authorize = (roles: string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        ok: false,
+        message: "You are not authorized to perform this action",
+      });
+    }
     next();
   };
 };
