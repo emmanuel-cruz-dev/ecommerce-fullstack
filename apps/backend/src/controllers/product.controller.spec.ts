@@ -1,45 +1,23 @@
 import request from "supertest";
-import { describe, beforeEach, test, vi } from "vitest";
+import { describe, beforeEach, test, vi, expect } from "vitest";
 import app from "../app";
-import productService from "../services/product.service";
-import { Product } from "@domain/src/entities/Product";
-import { ITokenService } from "@domain/src/ports/token-service";
 import { AuthenticatedUser } from "@domain/src/ports/auth-types";
+import { Product } from "@domain/src/entities/Product";
+import productService from "../services/product.service";
 
-const mocks = vi.hoisted(() => {
-  return {
-    tokenService: {
-      generateToken: vi.fn(),
-      verifyToken: vi.fn(),
-    } as ITokenService,
+vi.mock("../services/product.service.ts");
+
+const authMiddleware = vi.hoisted(() => {
+  const mockAdminUser: AuthenticatedUser = {
+    id: "admin123",
+    email: "admin@example.com",
+    username: "adminuser",
+    role: "admin",
   };
-});
-
-vi.mock("../middlewares/auth.middleware", () => {
   return {
-    tokenService: mocks.tokenService,
     authenticate: vi.fn((req, res, next) => {
-      const authHeader = req.headers.authorization;
-
-      if (!authHeader) {
-        return res.status(401).json({
-          ok: false,
-          message: "No authentication token provided",
-        });
-      }
-
-      const token = authHeader.split(" ")[1];
-
-      try {
-        const user = mocks.tokenService.verifyToken(token);
-        req.user = user;
-        next();
-      } catch (error) {
-        return res.status(403).json({
-          ok: false,
-          message: "Invalid or expired token",
-        });
-      }
+      req.user = mockAdminUser;
+      next();
     }),
     authorize: vi.fn((roles) => {
       return vi.fn((req, res, next) => {
@@ -55,7 +33,7 @@ vi.mock("../middlewares/auth.middleware", () => {
   };
 });
 
-vi.mock("../services/product.service.ts");
+vi.mock("../middlewares/auth.middleware", () => authMiddleware);
 
 describe("Product Controller", () => {
   const mockAdminUser: AuthenticatedUser = {
@@ -71,10 +49,6 @@ describe("Product Controller", () => {
     username: "normaluser",
     role: "user",
   };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   const mockProduct: Product = {
     id: "1",
@@ -93,6 +67,14 @@ describe("Product Controller", () => {
     mockProduct,
     { ...mockProduct, id: "2", name: "Another Product" },
   ];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    authMiddleware.authenticate.mockImplementation((req, res, next) => {
+      req.user = mockAdminUser;
+      next();
+    });
+  });
 
   describe("GET /api/products", () => {
     test("should return 200 and all products", async () => {
@@ -169,9 +151,6 @@ describe("Product Controller", () => {
     };
 
     test("should return 201 and the created product for an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
-
       vi.mocked(productService.createProduct).mockResolvedValue({
         id: "new-id",
         ...newProductData,
@@ -181,10 +160,7 @@ describe("Product Controller", () => {
         updatedAt: new Date().toISOString(),
       });
 
-      const res = await request(app)
-        .post("/api/products")
-        .set("Authorization", "Bearer mock-admin-token")
-        .send(newProductData);
+      const res = await request(app).post("/api/products").send(newProductData);
 
       expect(res.statusCode).toEqual(201);
       expect(res.body.ok).toBe(true);
@@ -197,6 +173,13 @@ describe("Product Controller", () => {
     });
 
     test("should return 401 if no token is provided", async () => {
+      authMiddleware.authenticate.mockImplementationOnce((req, res, next) => {
+        return res.status(401).json({
+          ok: false,
+          message: "No authentication token provided",
+        });
+      });
+
       const res = await request(app).post("/api/products").send(newProductData);
 
       expect(res.statusCode).toEqual(401);
@@ -206,13 +189,12 @@ describe("Product Controller", () => {
     });
 
     test("should return 403 if user is not an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockUser);
+      authMiddleware.authenticate.mockImplementationOnce((req, res, next) => {
+        req.user = mockUser;
+        next();
+      });
 
-      const res = await request(app)
-        .post("/api/products")
-        .set("Authorization", "Bearer mock-user-token")
-        .send(newProductData);
+      const res = await request(app).post("/api/products").send(newProductData);
 
       expect(res.statusCode).toEqual(403);
       expect(res.body.ok).toBe(false);
@@ -221,17 +203,11 @@ describe("Product Controller", () => {
     });
 
     test("should return 500 if an error occurs for an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
-
       vi.mocked(productService.createProduct).mockRejectedValue(
         new Error("Validation error")
       );
 
-      const res = await request(app)
-        .post("/api/products")
-        .set("Authorization", "Bearer mock-admin-token")
-        .send(newProductData);
+      const res = await request(app).post("/api/products").send(newProductData);
 
       expect(res.statusCode).toEqual(500);
       expect(res.body.ok).toBe(false);
@@ -257,13 +233,10 @@ describe("Product Controller", () => {
 
     test("should return 200 and the updated product for an admin", async () => {
       // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
-      // @ts-ignore
       vi.mocked(productService.updateProduct).mockResolvedValue(updatedProduct);
 
       const res = await request(app)
         .put("/api/products/1")
-        .set("Authorization", "Bearer mock-admin-token")
         .send(updateProductData);
 
       expect(res.statusCode).toEqual(200);
@@ -276,13 +249,10 @@ describe("Product Controller", () => {
     });
 
     test("should return 404 if product to update is not found", async () => {
-      // @ts-ignores
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
       vi.mocked(productService.updateProduct).mockResolvedValue(null);
 
       const res = await request(app)
         .put("/api/products/non-existent")
-        .set("Authorization", "Bearer mock-admin-token")
         .send(updateProductData);
 
       expect(res.statusCode).toEqual(404);
@@ -297,6 +267,13 @@ describe("Product Controller", () => {
     });
 
     test("should return 401 if no token is provided", async () => {
+      authMiddleware.authenticate.mockImplementationOnce((req, res, next) => {
+        return res.status(401).json({
+          ok: false,
+          message: "No authentication token provided",
+        });
+      });
+
       const res = await request(app)
         .put("/api/products/1")
         .send(updateProductData);
@@ -308,12 +285,13 @@ describe("Product Controller", () => {
     });
 
     test("should return 403 if user is not an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockUser);
+      authMiddleware.authenticate.mockImplementationOnce((req, res, next) => {
+        req.user = mockUser;
+        next();
+      });
 
       const res = await request(app)
         .put("/api/products/1")
-        .set("Authorization", "Bearer mock-user-token")
         .send(updateProductData);
 
       expect(res.statusCode).toEqual(403);
@@ -323,15 +301,12 @@ describe("Product Controller", () => {
     });
 
     test("should return 500 if an error occurs for an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
       vi.mocked(productService.updateProduct).mockRejectedValue(
         new Error("Database error")
       );
 
       const res = await request(app)
         .put("/api/products/1")
-        .set("Authorization", "Bearer mock-admin-token")
         .send(updateProductData);
 
       expect(res.statusCode).toEqual(500);
@@ -342,13 +317,9 @@ describe("Product Controller", () => {
 
   describe("DELETE /api/products/:productId", () => {
     test("should return 200 and success message when product is deleted by admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
       vi.mocked(productService.deleteProduct).mockResolvedValue(true);
 
-      const res = await request(app)
-        .delete("/api/products/1")
-        .set("Authorization", "Bearer mock-admin-token");
+      const res = await request(app).delete("/api/products/1");
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.ok).toBe(true);
@@ -357,13 +328,9 @@ describe("Product Controller", () => {
     });
 
     test("should return 404 if product to delete is not found", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
       vi.mocked(productService.deleteProduct).mockResolvedValue(false);
 
-      const res = await request(app)
-        .delete("/api/products/non-existent")
-        .set("Authorization", "Bearer mock-admin-token");
+      const res = await request(app).delete("/api/products/non-existent");
 
       expect(res.statusCode).toEqual(404);
       expect(res.body.ok).toBe(false);
@@ -374,6 +341,12 @@ describe("Product Controller", () => {
     });
 
     test("should return 401 if no token is provided", async () => {
+      authMiddleware.authenticate.mockImplementationOnce((req, res, next) => {
+        return res.status(401).json({
+          ok: false,
+          message: "No authentication token provided",
+        });
+      });
       const res = await request(app).delete("/api/products/1");
 
       expect(res.statusCode).toEqual(401);
@@ -383,12 +356,11 @@ describe("Product Controller", () => {
     });
 
     test("should return 403 if user is not an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockUser);
-
-      const res = await request(app)
-        .delete("/api/products/1")
-        .set("Authorization", "Bearer mock-user-token");
+      authMiddleware.authenticate.mockImplementationOnce((req, res, next) => {
+        req.user = mockUser;
+        next();
+      });
+      const res = await request(app).delete("/api/products/1");
 
       expect(res.statusCode).toEqual(403);
       expect(res.body.ok).toBe(false);
@@ -397,15 +369,11 @@ describe("Product Controller", () => {
     });
 
     test("should return 500 if an error occurs for an admin", async () => {
-      // @ts-ignore
-      vi.mocked(mocks.tokenService.verifyToken).mockReturnValue(mockAdminUser);
       vi.mocked(productService.deleteProduct).mockRejectedValue(
         new Error("Database error")
       );
 
-      const res = await request(app)
-        .delete("/api/products/1")
-        .set("Authorization", "Bearer mock-admin-token");
+      const res = await request(app).delete("/api/products/1");
 
       expect(res.statusCode).toEqual(500);
       expect(res.body.ok).toBe(false);
