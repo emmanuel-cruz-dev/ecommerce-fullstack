@@ -1,36 +1,65 @@
-import { User } from "@domain/src/entities/User";
-import { UserRepository } from "@domain/src/repositories/user-repository";
-import { IPasswordHasher } from "@domain/src/ports/password-hasher";
-import { ITokenService } from "@domain/src/ports/token-service";
-import { UserRegister } from "@domain/src/use-cases/user-register";
-import { UserLogin } from "@domain/src/use-cases/user-login";
-import { mockUserRepository } from "@domain/src/mocks/user-repository-mock";
-import { BcryptPasswordHasher } from "@domain/src/infrastructure/security/bcrypt-password-hasher";
-import { JwtTokenService } from "@domain/src/infrastructure/security/jwt-token-service";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import userRepository from "../data/user.repository";
+import { User, UserRole } from "@domain/src/entities/User";
 
-const inMemoryUsers: User[] = [];
-const userRepository: UserRepository = mockUserRepository(inMemoryUsers);
-const passwordHasher: IPasswordHasher = new BcryptPasswordHasher();
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-const jwtSecret = process.env.JWT_SECRET || "your_super_secret_jwt_key";
-const tokenService: ITokenService = new JwtTokenService(jwtSecret);
+interface AuthPayload {
+  id: string;
+  email: string;
+  role: UserRole;
+}
 
-const registerUser = async (userData: User): Promise<User> => {
-  return await UserRegister(userData, userRepository, passwordHasher);
+const generateAuthToken = (user: User): string => {
+  const payload: AuthPayload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  };
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 };
 
-const loginUser = async (
+const signUp = async (userData: Omit<User, "id">): Promise<string> => {
+  const existingUser = await userRepository.findByEmail(userData.email);
+  if (existingUser) {
+    throw new Error("El correo electrónico ya está registrado.");
+  }
+
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
+  const newUser: User = {
+    ...userData,
+    id: "",
+    password: hashedPassword,
+    role: "user",
+  };
+
+  const savedUser = await userRepository.save(newUser);
+  return generateAuthToken(savedUser);
+};
+
+const signIn = async (
   email: string,
-  password: string
-): Promise<{ user: User; token: string }> => {
-  const user = await UserLogin(email, password, userRepository, passwordHasher);
+  passwordFromRequest: string
+): Promise<string> => {
+  const user = await userRepository.findByEmail(email);
+  if (!user) {
+    throw new Error("Correo electrónico o contraseña incorrectos.");
+  }
 
-  const token = tokenService.generateToken(user);
+  const isPasswordValid = await bcrypt.compare(
+    passwordFromRequest,
+    user.password
+  );
+  if (!isPasswordValid) {
+    throw new Error("Correo electrónico o contraseña incorrectos.");
+  }
 
-  return { user, token };
+  return generateAuthToken(user);
 };
 
 export default {
-  registerUser,
-  loginUser,
+  signUp,
+  signIn,
+  generateAuthToken,
 };
