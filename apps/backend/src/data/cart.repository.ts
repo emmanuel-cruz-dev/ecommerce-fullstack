@@ -1,20 +1,50 @@
 import { Cart } from "@domain/src/entities/Cart";
-import { CartRepository } from "@domain/src/repositories/cart-repository";
+import { cartsDB } from "../database/cart.db";
 
-const carts: Cart[] = [];
+const findCartByUserId = async (userId: string): Promise<Cart | null> => {
+  return cartsDB.find((cart) => cart.userId === userId) || null;
+};
 
-export const cartRepository: CartRepository = {
-  carts: carts,
+const saveCart = async (cart: Cart): Promise<Cart> => {
+  const existingIndex = cartsDB.findIndex((c) => c.id === cart.id);
+  if (existingIndex !== -1) {
+    cartsDB[existingIndex] = cart;
+  } else {
+    cartsDB.push(cart);
+  }
+  return cart;
+};
 
-  findCartByUserId(userId: string): Cart | undefined {
-    return carts.find((cart) => cart.userId === userId);
-  },
-  saveCart(cart: Cart): void {
-    const index = carts.findIndex((c) => c.id === cart.id);
-    if (index !== -1) {
-      carts[index] = cart;
-    } else {
-      carts.push(cart);
+const clearCart = async (userId: string): Promise<boolean> => {
+  const index = cartsDB.findIndex((cart) => cart.userId === userId);
+  if (index !== -1) {
+    cartsDB.splice(index, 1);
+    return true;
+  }
+  return false;
+};
+
+const removeCartItem = async (
+  userId: string,
+  productId: string
+): Promise<boolean> => {
+  const cart = await findCartByUserId(userId);
+  if (cart) {
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId === productId
+    );
+    if (itemIndex !== -1) {
+      cart.items.splice(itemIndex, 1);
+      await saveCart(cart);
+      return true;
     }
-  },
+  }
+  return false;
+};
+
+export default {
+  findCartByUserId,
+  saveCart,
+  clearCart,
+  removeCartItem,
 };
