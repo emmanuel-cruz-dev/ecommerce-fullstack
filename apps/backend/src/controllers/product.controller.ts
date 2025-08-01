@@ -49,7 +49,7 @@ const updateProduct = async (req: Request, res: Response) => {
     if (!updatedProduct) {
       return res
         .status(404)
-        .json({ ok: false, error: `Producto con ID '${id}' no encontrado` });
+        .json({ ok: false, message: `Producto con ID '${id}' no encontrado` });
     }
 
     res.status(200).json({ ok: true, payload: updatedProduct });
@@ -67,7 +67,7 @@ const deleteProduct = async (req: Request, res: Response) => {
     if (!deletedProduct) {
       return res
         .status(404)
-        .json({ ok: false, error: `Producto con ID '${id}' no encontrado` });
+        .json({ ok: false, message: `Producto con ID '${id}' no encontrado` });
     }
 
     res.status(200).json({ ok: true, payload: deletedProduct });
