@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { AddToCart } from "@domain/src/use-cases/add-to-cart";
 import { AuthenticatedRequest } from "@domain/src/ports/auth-types";
-import { cartRepository } from "../data/cart.repository";
+import cartService from "../services/cart.service";
 
 export default {
   async addToCart(req: Request, res: Response): Promise<Response> {
@@ -16,21 +15,71 @@ export default {
         productPrice,
         quantity,
       };
+      const updatedCart = await cartService.addToCart(request);
 
-      const updatedCart = await AddToCart(request, cartRepository);
       return res.status(200).json({ ok: true, payload: updatedCart });
     } catch (error) {
-      if (error instanceof Error) {
-        if (
-          error.message.includes("is required") ||
-          error.message.includes("must be greater")
-        ) {
-          return res.status(400).json({ ok: false, message: error.message });
-        }
-        return res
-          .status(500)
-          .json({ ok: false, message: "Error interno del servidor" });
+      return res
+        .status(400)
+        .json({ ok: false, message: (error as Error).message });
+    }
+  },
+
+  async getCartContent(req: Request, res: Response): Promise<Response> {
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    try {
+      const cart = await cartService.getCartContent(userId);
+
+      return res.status(200).json({ ok: true, payload: cart });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ ok: false, message: "Error interno del servidor" });
+    }
+  },
+
+  async removeFromCart(req: Request, res: Response): Promise<Response> {
+    const { productId } = req.params;
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    try {
+      const success = await cartService.removeFromCart(userId, productId);
+
+      if (!success) {
+        return res.status(404).json({
+          ok: false,
+          message: "El producto no se encontró en el carrito",
+        });
       }
+
+      return res
+        .status(200)
+        .json({ ok: true, message: "Producto eliminado del carrito" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ ok: false, message: "Error interno del servidor" });
+    }
+  },
+
+  async clearCart(req: Request, res: Response): Promise<Response> {
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    try {
+      const success = await cartService.clearCart(userId);
+
+      if (!success) {
+        return res.status(404).json({
+          ok: false,
+          message: "El carrito del usuario no se encontró",
+        });
+      }
+
+      return res
+        .status(200)
+        .json({ ok: true, message: "Carrito vaciado correctamente" });
+    } catch (error) {
       return res
         .status(500)
         .json({ ok: false, message: "Error interno del servidor" });
