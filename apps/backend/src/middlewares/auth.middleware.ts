@@ -2,21 +2,17 @@ import { Request, Response, NextFunction } from "express";
 import { ITokenService } from "@domain/src/ports/token-service";
 import { UserRole } from "@domain/src/entities/User";
 import { JwtTokenService } from "@domain/src/infrastructure/security/jwt-token-service";
+import { AuthenticatedUser } from "@domain/src/ports/auth-types";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        id: string;
-        email: string;
-        username: string;
-        role: UserRole;
-      };
+      user?: AuthenticatedUser;
     }
   }
 }
 
-const tokenService: ITokenService = new JwtTokenService(
+export const tokenService: ITokenService = new JwtTokenService(
   process.env.JWT_SECRET || "default-secret-for-dev"
 );
 
