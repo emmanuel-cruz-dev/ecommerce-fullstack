@@ -1,4 +1,5 @@
 import { Cart } from "../entities/Cart";
+import { CartRepository } from "../repositories/cart-repository";
 
 export interface AddToCartRequest {
   userId: string;
@@ -8,15 +9,9 @@ export interface AddToCartRequest {
   quantity: number;
 }
 
-export interface MockedCartRepository {
-  carts: Cart[];
-  findCartByUserId(userId: string): Cart | undefined;
-  saveCart(cart: Cart): void;
-}
-
 export async function AddToCart(
   request: AddToCartRequest,
-  repository: MockedCartRepository
+  repository: CartRepository
 ): Promise<Cart> {
   let cart = repository.findCartByUserId(request.userId);
   validateAddToCartData(request);
