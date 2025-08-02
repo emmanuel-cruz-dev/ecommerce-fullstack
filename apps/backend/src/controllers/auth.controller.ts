@@ -1,41 +1,52 @@
 import { Request, Response } from "express";
 import authService from "../services/auth.service";
-import { handleError } from "../errors/error";
-import { UserLoginError } from "@domain/src/use-cases/user-login";
+import { User } from "@domain/src/entities/User";
 
-const register = async (req: Request, res: Response) => {
-  try {
-    const newUser = await authService.registerUser(req.body);
-    const { password, ...userWithoutPassword } = newUser;
-    res.status(201).json({
-      ok: true,
-      payload: userWithoutPassword,
-      message: "User registered successfully",
+const signUp = async (req: Request, res: Response): Promise<Response> => {
+  const { email, password, username, role } = req.body;
+
+  if (!email || !password || !username) {
+    return res.status(400).json({
+      ok: false,
+      message: "Faltan campos obligatorios: email, password, username",
     });
+  }
+
+  try {
+    const newUser: Omit<User, "id"> = {
+      email,
+      password,
+      username,
+      role: role || "user",
+    };
+    const token = await authService.signUp(newUser);
+    return res.status(201).json({ ok: true, payload: { token } });
   } catch (error) {
-    return handleError(res, error);
+    const errorMessage = (error as Error).message;
+    return res.status(409).json({ ok: false, message: errorMessage });
   }
 };
 
-const login = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    const { user, token } = await authService.loginUser(email, password);
-    const { password: userPassword, ...userWithoutPassword } = user;
-    res.status(200).json({
-      ok: true,
-      payload: { user: userWithoutPassword, token },
-      message: "Login successful",
+const signIn = async (req: Request, res: Response): Promise<Response> => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      ok: false,
+      message: "Faltan campos obligatorios: email, password",
     });
+  }
+
+  try {
+    const token = await authService.signIn(email, password);
+    return res.status(200).json({ ok: true, payload: { token } });
   } catch (error) {
-    if (error instanceof UserLoginError) {
-      return res.status(401).json({ ok: false, message: error.message });
-    }
-    return handleError(res, error);
+    const errorMessage = (error as Error).message;
+    return res.status(401).json({ ok: false, message: errorMessage });
   }
 };
 
 export default {
-  register,
-  login,
+  signUp,
+  signIn,
 };
