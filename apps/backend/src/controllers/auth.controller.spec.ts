@@ -1,158 +1,109 @@
 import request from "supertest";
-import { describe, test, vi } from "vitest";
+import { describe, beforeEach, test, vi, expect } from "vitest";
 import app from "../app";
+import { usersDB } from "../database/users.db";
 import authService from "../services/auth.service";
-import { User } from "@domain/src/entities/User";
-import { UserLoginError } from "@domain/src/use-cases/user-login";
 
 vi.mock("../services/auth.service");
 
 describe("Auth Controller", () => {
+  const newUser = {
+    email: "test@example.com",
+    password: "Password123!",
+    username: "testuser",
+  };
+
   beforeEach(() => {
+    usersDB.length = 0;
     vi.clearAllMocks();
   });
 
-  const mockUser: User = {
-    id: "user123",
-    username: "testuser",
-    email: "test@example.com",
-    password: "hashed_password",
-    role: "user",
-  };
-
-  const mockLoginResponse = {
-    user: { ...mockUser, password: undefined },
-    token: "mocked-jwt-token",
-  };
-
   describe("POST /api/auth/register", () => {
-    const newUserInput = {
-      username: "newuser",
-      email: "new@example.com",
-      password: "securepassword",
-      role: "user",
-    };
+    test("should register a new user and return a token", async () => {
+      vi.mocked(authService.signUp).mockResolvedValue("mock-token-123");
 
-    test("should return 201 and the registered user (without password)", async () => {
-      // @ts-ignore
-      authService.registerUser.mockResolvedValue({
-        ...mockUser,
-        id: "newId",
-        ...newUserInput,
-        password: "hashed_password",
-      });
+      const res = await request(app).post("/api/auth/register").send(newUser);
 
-      const res = await request(app)
-        .post("/api/auth/register")
-        .send(newUserInput);
-
-      expect(res.statusCode).toEqual(201);
+      expect(res.statusCode).toBe(201);
       expect(res.body.ok).toBe(true);
-      expect(res.body.payload).toEqual(
-        expect.objectContaining({
-          id: "newId",
-          username: newUserInput.username,
-          email: newUserInput.email,
-          role: newUserInput.role,
-        })
-      );
-      expect(res.body.payload).not.toHaveProperty("password");
-      expect(authService.registerUser).toHaveBeenCalledWith(
-        expect.objectContaining(newUserInput)
+      expect(res.body.payload.token).toBe("mock-token-123");
+      expect(authService.signUp).toHaveBeenCalledWith(
+        expect.objectContaining({ email: newUser.email })
       );
     });
 
-    test("should return 500 if registration fails (e.g., email in use)", async () => {
-      // @ts-ignore
-      authService.registerUser.mockRejectedValue(
-        new Error("Email is already in use")
+    test("should return 409 if the email already exists", async () => {
+      vi.mocked(authService.signUp).mockRejectedValue(
+        new Error("El correo electrónico ya está registrado.")
       );
 
-      const res = await request(app)
-        .post("/api/auth/register")
-        .send(newUserInput);
+      const res = await request(app).post("/api/auth/register").send(newUser);
 
-      expect(res.statusCode).toEqual(500);
+      expect(res.statusCode).toBe(409);
       expect(res.body.ok).toBe(false);
-      expect(res.body.message).toBe("Error interno del servidor");
+      expect(res.body.message).toBe(
+        "El correo electrónico ya está registrado."
+      );
     });
 
-    test("should return 500 if validation fails", async () => {
-      const invalidInput = {
-        username: "newuser",
-        email: "",
-        password: "securepassword",
-        role: "user",
-      };
-      // @ts-ignore
-      authService.registerUser.mockRejectedValue(
-        new Error("Email is required")
-      );
-
+    test("should return 400 if required fields are missing", async () => {
+      const incompleteUser = { email: "test@example.com" };
       const res = await request(app)
         .post("/api/auth/register")
-        .send(invalidInput);
+        .send(incompleteUser);
 
-      expect(res.statusCode).toEqual(500);
+      expect(res.statusCode).toBe(400);
       expect(res.body.ok).toBe(false);
-      expect(res.body.message).toBe("Error interno del servidor");
+      expect(res.body.message).toBe(
+        "Faltan campos obligatorios: email, password, username"
+      );
     });
   });
 
   describe("POST /api/auth/login", () => {
-    const loginCredentials = {
-      email: "test@example.com",
-      password: "securepassword",
-    };
-
-    test("should return 200 and a token on successful login", async () => {
-      // @ts-ignore
-      authService.loginUser.mockResolvedValue(mockLoginResponse);
+    test("should return a token for a valid login", async () => {
+      vi.mocked(authService.signIn).mockResolvedValue("mock-token-456");
 
       const res = await request(app)
         .post("/api/auth/login")
-        .send(loginCredentials);
+        .send({ email: newUser.email, password: newUser.password });
 
-      expect(res.statusCode).toEqual(200);
+      expect(res.statusCode).toBe(200);
       expect(res.body.ok).toBe(true);
-      expect(res.body.payload.token).toBe("mocked-jwt-token");
-      expect(res.body.payload.user).toEqual(mockLoginResponse.user);
-      expect(res.body.payload.user).not.toHaveProperty("password");
-      expect(authService.loginUser).toHaveBeenCalledWith(
-        loginCredentials.email,
-        loginCredentials.password
+      expect(res.body.payload.token).toBe("mock-token-456");
+      expect(authService.signIn).toHaveBeenCalledWith(
+        newUser.email,
+        newUser.password
       );
     });
 
     test("should return 401 for invalid credentials", async () => {
-      // @ts-ignore
-      authService.loginUser.mockRejectedValue(
-        new UserLoginError("Invalid credentials")
+      vi.mocked(authService.signIn).mockRejectedValue(
+        new Error("Correo electrónico o contraseña incorrectos.")
       );
 
       const res = await request(app)
         .post("/api/auth/login")
-        .send({ email: "wrong@example.com", password: "wrong" });
+        .send({ email: newUser.email, password: "wrong-password" });
 
-      expect(res.statusCode).toEqual(401);
+      expect(res.statusCode).toBe(401);
       expect(res.body.ok).toBe(false);
-      expect(res.body.message).toBe("Invalid credentials");
-      expect(authService.loginUser).toHaveBeenCalled();
+      expect(res.body.message).toBe(
+        "Correo electrónico o contraseña incorrectos."
+      );
     });
 
-    test("should return 500 if an unexpected error occurs during login", async () => {
-      // @ts-ignore
-      authService.loginUser.mockRejectedValue(
-        new Error("Database connection failed")
-      );
-
+    test("should return 400 if required fields are missing", async () => {
+      const incompleteLogin = { email: newUser.email };
       const res = await request(app)
         .post("/api/auth/login")
-        .send(loginCredentials);
+        .send(incompleteLogin);
 
-      expect(res.statusCode).toEqual(500);
+      expect(res.statusCode).toBe(400);
       expect(res.body.ok).toBe(false);
-      expect(res.body.message).toBe("Error interno del servidor");
+      expect(res.body.message).toBe(
+        "Faltan campos obligatorios: email, password"
+      );
     });
   });
 });
