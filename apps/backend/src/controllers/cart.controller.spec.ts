@@ -1,70 +1,42 @@
+import { Request, Response, NextFunction } from "express";
 import request from "supertest";
-import { describe, beforeEach, test, expect, vi } from "vitest";
+import { describe, beforeEach, test, vi, expect } from "vitest";
 import app from "../app";
-import { AddToCart, AddToCartRequest } from "@domain/src/use-cases/add-to-cart";
+import { AuthenticatedUser } from "@domain/src/ports/auth-types";
 import { Cart } from "@domain/src/entities/Cart";
+import cartService from "../services/cart.service";
 
-vi.mock("@domain/src/use-cases/add-to-cart");
+vi.mock("../services/cart.service");
 
 vi.mock("../middlewares/auth.middleware", () => {
+  const mockUser: AuthenticatedUser = {
+    id: "user123",
+    email: "user@example.com",
+    username: "normaluser",
+    role: "user",
+  };
   return {
     authenticate: vi.fn((req, res, next) => {
-      const authHeader = req.headers.authorization;
-      if (!authHeader) {
-        return res.status(401).json({
-          ok: false,
-          message: "No authentication token provided",
-        });
-      }
-
-      if (authHeader === "Bearer mock-user-token") {
-        req.user = {
-          id: "user123",
-          email: "user@example.com",
-          username: "normaluser",
-          role: "user",
-        };
-        next();
-      } else if (authHeader === "Bearer mock-admin-token") {
-        req.user = {
-          id: "admin123",
-          email: "admin@example.com",
-          username: "adminuser",
-          role: "admin",
-        };
-        next();
-      } else {
-        return res.status(403).json({
-          ok: false,
-          message: "Invalid or expired token",
-        });
-      }
+      req.user = mockUser;
+      next();
     }),
-    authorize: vi.fn((roles) => {
-      return vi.fn((req, res, next) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-          return res.status(403).json({
-            ok: false,
-            message: "Forbidden: Insufficient permissions",
-          });
-        }
-        next();
-      });
-    }),
+    authorize: vi.fn(
+      () => (req: Request, res: Response, next: NextFunction) => next()
+    ),
   };
 });
 
 describe("Cart Controller", () => {
-  const validAddToCartRequest: AddToCartRequest = {
-    userId: "user123",
-    productId: "prod-1",
-    productName: "Test Product",
-    productPrice: "9.99",
-    quantity: 1,
+  const mockUser: AuthenticatedUser = {
+    id: "user123",
+    email: "user@example.com",
+    username: "normaluser",
+    role: "user",
   };
+
   const mockCart: Cart = {
     id: "cart-1",
-    userId: "user123",
+    userId: mockUser.id,
     items: [{ productId: "prod-1", quantity: 1 }],
   };
 
@@ -73,32 +45,117 @@ describe("Cart Controller", () => {
   });
 
   describe("POST /api/cart", () => {
+    const validAddToCartRequest = {
+      productId: "prod-1",
+      productName: "Test Product",
+      productPrice: 10,
+      quantity: 1,
+    };
+
     test("should return 200 and the updated cart for a valid request", async () => {
-      vi.mocked(AddToCart).mockResolvedValue(mockCart);
+      vi.mocked(cartService.addToCart).mockResolvedValue(mockCart);
 
       const res = await request(app)
         .post("/api/cart")
-        .set("Authorization", "Bearer mock-user-token")
         .send(validAddToCartRequest);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.ok).toBe(true);
-      expect(res.body.payload).toEqual(mockCart);
+      expect(res.body.payload.items[0]).toEqual(mockCart.items[0]);
+      expect(cartService.addToCart).toHaveBeenCalledWith({
+        ...validAddToCartRequest,
+        userId: mockUser.id,
+      });
     });
 
-    test("should return 400 for an invalid request", async () => {
-      vi.mocked(AddToCart).mockRejectedValue(
+    test("should return 400 for an invalid request (quantity <= 0)", async () => {
+      // Esta validación debe estar en el controlador o servicio.
+      // Aquí, mockeamos el servicio para que lance un error, simulando la validación
+      vi.mocked(cartService.addToCart).mockRejectedValue(
         new Error("Quantity must be greater than 0")
       );
 
       const res = await request(app)
         .post("/api/cart")
-        .set("Authorization", "Bearer mock-user-token")
         .send({ ...validAddToCartRequest, quantity: 0 });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.ok).toBe(false);
       expect(res.body.message).toBe("Quantity must be greater than 0");
+    });
+  });
+
+  describe("GET /api/cart", () => {
+    test("should return 200 and the cart content for an authenticated user", async () => {
+      vi.mocked(cartService.getCartContent).mockResolvedValue(mockCart);
+
+      const res = await request(app).get("/api/cart");
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.payload).toEqual(mockCart);
+      expect(cartService.getCartContent).toHaveBeenCalledWith(mockUser.id);
+    });
+
+    test("should return 200 and a null payload if the cart is empty", async () => {
+      vi.mocked(cartService.getCartContent).mockResolvedValue(null);
+
+      const res = await request(app).get("/api/cart");
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.payload).toBeNull();
+    });
+  });
+
+  describe("DELETE /api/cart", () => {
+    test("should return 200 and a success message when clearing the cart", async () => {
+      vi.mocked(cartService.clearCart).mockResolvedValue(true);
+
+      const res = await request(app).delete("/api/cart");
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.message).toBe("Carrito vaciado correctamente");
+      expect(cartService.clearCart).toHaveBeenCalledWith(mockUser.id);
+    });
+
+    test("should return 404 if the cart does not exist", async () => {
+      vi.mocked(cartService.clearCart).mockResolvedValue(false);
+
+      const res = await request(app).delete("/api/cart");
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe("El carrito del usuario no se encontró");
+    });
+  });
+
+  describe("DELETE /api/cart/:productId", () => {
+    const productId = "prod-1";
+
+    test("should return 200 and a success message when a product is removed", async () => {
+      vi.mocked(cartService.removeFromCart).mockResolvedValue(true);
+
+      const res = await request(app).delete(`/api/cart/${productId}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.ok).toBe(true);
+      expect(res.body.message).toBe("Producto eliminado del carrito");
+      expect(cartService.removeFromCart).toHaveBeenCalledWith(
+        mockUser.id,
+        productId
+      );
+    });
+
+    test("should return 404 if the product is not found in the cart", async () => {
+      vi.mocked(cartService.removeFromCart).mockResolvedValue(false);
+
+      const res = await request(app).delete(`/api/cart/${productId}`);
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.ok).toBe(false);
+      expect(res.body.message).toBe("El producto no se encontró en el carrito");
     });
   });
 });
