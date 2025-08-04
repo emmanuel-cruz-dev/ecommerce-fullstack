@@ -26,7 +26,7 @@ const signUp = async (userData: Omit<User, "id">): Promise<string> => {
     ...userData,
     id: "",
     password: hashedPassword,
-    role: "user",
+    role: userData.role || "user",
   };
 
   const savedUser = await userRepository.save(newUser);
