@@ -1,17 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import userRepository from "../data/user.repository";
+import { AuthenticatedRequest } from "src/types/types";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    username: string;
-    role: string;
-  };
-}
 
 export const authenticate = async (
   req: AuthenticatedRequest,
