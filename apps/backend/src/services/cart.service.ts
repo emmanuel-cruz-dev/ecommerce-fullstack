@@ -1,14 +1,7 @@
 import { CartItem } from "@domain/src/entities/Cart";
 import cartRepository from "../data/cart.repository";
 import { v4 as uuid } from "uuid";
-
-interface AddToCartRequest {
-  userId: string;
-  productId: string;
-  productName: string;
-  productPrice: number;
-  quantity: number;
-}
+import { AddToCartRequest } from "src/types/types";
 
 const getCartContent = async (userId: string) => {
   return await cartRepository.findCartByUserId(userId);
