@@ -1,15 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import userRepository from "../data/user.repository";
-import { User, UserRole } from "@domain/src/entities/User";
+import { User } from "@domain/src/entities/User";
+import { AuthPayload } from "src/types/types";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-
-interface AuthPayload {
-  id: string;
-  email: string;
-  role: UserRole;
-}
 
 const generateAuthToken = (user: User): string => {
   const payload: AuthPayload = {
