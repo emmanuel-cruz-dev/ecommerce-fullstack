@@ -7,12 +7,14 @@ interface ProductCardProps {
 
 export const ProductCard: FC<ProductCardProps> = ({ product }) => {
   return (
-    <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <img
-        className="w-full h-48 object-cover"
-        src={product.imageUrl || "https://via.placeholder.com/150"}
-        alt={product.name}
-      />
+    <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-sm">
+      <figure className="w-32 h-40 mx-auto">
+        <img
+          className="w-full h-full object-cover"
+          src={product.imageUrl || "https://via.placeholder.com/150"}
+          alt={product.name}
+        />
+      </figure>
       <div className="p-4">
         <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
         <p className="mt-1 text-gray-600">{product.description}</p>
