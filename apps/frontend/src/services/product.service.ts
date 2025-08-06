@@ -5,3 +5,8 @@ export const getProducts = async (): Promise<Product[]> => {
   const response = await api.get("/products");
   return response.data.payload;
 };
+
+export const getProductById = async (id: string): Promise<Product | null> => {
+  const response = await api.get(`/products/${id}`);
+  return response.data.payload;
+};
