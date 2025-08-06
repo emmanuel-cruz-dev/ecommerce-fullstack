@@ -13,6 +13,8 @@
     "test-storybook": "@storybook/test-runner"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.84.1",
+    "axios": "^1.11.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
