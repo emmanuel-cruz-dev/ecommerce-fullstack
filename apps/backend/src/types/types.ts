@@ -7,6 +7,10 @@ export interface AuthPayload {
   role: UserRole;
 }
 
+export interface RefreshPayload {
+  id: string;
+}
+
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
