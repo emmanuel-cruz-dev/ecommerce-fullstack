@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { AuthenticatedRequest } from "@domain/src/ports/auth-types";
 import authService from "../services/auth.service";
 import { User } from "@domain/src/entities/User";
 
@@ -46,7 +47,27 @@ const signIn = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
+const getMe = async (req: Request, res: Response): Promise<Response> => {
+  const userId = (req as AuthenticatedRequest).user.id;
+  try {
+    const user = await authService.getUserById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ ok: false, message: "Usuario no encontrado" });
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    return res.status(200).json({ ok: true, payload: userWithoutPassword });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ ok: false, message: "Error interno del servidor" });
+  }
+};
+
 export default {
   signUp,
   signIn,
+  getMe,
 };
