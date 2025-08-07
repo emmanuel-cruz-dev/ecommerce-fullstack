@@ -53,8 +53,13 @@ const signIn = async (
   return generateAuthToken(user);
 };
 
+const getUserById = async (id: string): Promise<User | null> => {
+  return userRepository.findById(id);
+};
+
 export default {
   signUp,
   signIn,
   generateAuthToken,
+  getUserById,
 };
