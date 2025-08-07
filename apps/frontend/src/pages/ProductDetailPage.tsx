@@ -1,13 +1,16 @@
 import type { FC } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProductById } from "../services/product.service";
 import { addToCart } from "src/services/cart.service";
+import { useAuth } from "src/context/auth.context";
 import type { AddToCartRequest } from "../../../backend/src/types/types";
 
 export const ProductDetailPage: FC = () => {
   const { productId } = useParams<{ productId: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { isAuthenticated, token } = useAuth();
 
   const {
     data: product,
@@ -20,7 +23,7 @@ export const ProductDetailPage: FC = () => {
   });
 
   const { mutate, isPending: isAdding } = useMutation({
-    mutationFn: (data: AddToCartRequest) => addToCart(data),
+    mutationFn: (data: AddToCartRequest) => addToCart(data, token!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       alert("Producto añadido al carrito!");
@@ -32,6 +35,12 @@ export const ProductDetailPage: FC = () => {
   });
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para añadir productos al carrito.");
+      navigate("/login");
+      return;
+    }
+
     if (product && productId) {
       const requestData = {
         userId: "AUTH_TOKEN",
