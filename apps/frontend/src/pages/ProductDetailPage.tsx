@@ -1,10 +1,13 @@
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getProductById } from "../services/product.service";
 import type { FC } from "react";
+import { useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getProductById } from "../services/product.service";
+import { addToCart } from "src/services/cart.service";
+import type { AddToCartRequest } from "../../../backend/src/types/types";
 
 export const ProductDetailPage: FC = () => {
   const { productId } = useParams<{ productId: string }>();
+  const queryClient = useQueryClient();
 
   const {
     data: product,
@@ -15,6 +18,31 @@ export const ProductDetailPage: FC = () => {
     queryFn: () => getProductById(productId!),
     enabled: !!productId,
   });
+
+  const { mutate, isPending: isAdding } = useMutation({
+    mutationFn: (data: AddToCartRequest) => addToCart(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      alert("Producto añadido al carrito!");
+    },
+    onError: (error) => {
+      console.error("Error al añadir al carrito", error);
+      alert("Error al añadir al carrito. Revisa la consola.");
+    },
+  });
+
+  const handleAddToCart = () => {
+    if (product && productId) {
+      const requestData = {
+        userId: "AUTH_TOKEN",
+        productId: productId,
+        productName: product.name,
+        productPrice: product.price,
+        quantity: 1,
+      };
+      mutate(requestData);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -48,8 +76,12 @@ export const ProductDetailPage: FC = () => {
           ${product.price}
         </p>
         <p className="mt-2 text-gray-500">Stock disponible: {product.stock}</p>
-        <button className="mt-6 bg-blue-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-600 transition-colors text-md">
-          Añadir al carrito
+        <button
+          className="mt-6 bg-blue-500 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-600 transition-colors text-md"
+          onClick={handleAddToCart}
+          disabled={isAdding || product.stock === 0}
+        >
+          {isAdding ? "Añadiendo..." : "Añadir al carrito"}
         </button>
       </aside>
     </article>
