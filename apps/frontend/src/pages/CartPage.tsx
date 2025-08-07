@@ -11,14 +11,14 @@ interface CombinedCartItem extends Product {
 }
 
 export const CartPage: React.FC = () => {
-  const { token, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const {
     data: cartData,
     isLoading: isCartLoading,
     isError: isCartError,
   } = useQuery<Cart>({
     queryKey: ["cart"],
-    queryFn: () => getCart(token!),
+    queryFn: () => getCart(),
     enabled: isAuthenticated,
   });
 
