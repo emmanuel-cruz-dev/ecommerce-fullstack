@@ -1,4 +1,3 @@
-import type { User } from "src/types/user";
 import api from "../api";
 import type { LoginRequest, RegisterRequest } from "src/types/auth";
 
@@ -12,9 +11,7 @@ export const register = async (request: RegisterRequest) => {
   return response.data;
 };
 
-export const getMe = async (token: string): Promise<User> => {
-  const response = await api.get("/auth/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getMe = async () => {
+  const response = await api.get("/auth/me");
   return response.data.payload;
 };
