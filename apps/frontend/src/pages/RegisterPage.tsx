@@ -3,7 +3,7 @@ import { useAuth } from "../context/auth.context";
 import { useNavigate } from "react-router-dom";
 
 export const RegisterPage: React.FC = () => {
-  const [name, setName] = useState("");
+  const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { register } = useAuth();
@@ -12,7 +12,7 @@ export const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register({ name, email, password });
+      await register({ username, email, password });
       navigate("/");
     } catch (error) {
       alert(
@@ -31,15 +31,15 @@ export const RegisterPage: React.FC = () => {
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
+              htmlFor="username"
             >
               Nombre
             </label>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="username"
+              value={username}
+              onChange={(e) => setUserName(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
