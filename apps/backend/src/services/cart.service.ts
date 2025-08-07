@@ -39,22 +39,22 @@ const getCartByUserId = async (userId: string): Promise<Cart | null> => {
 const removeFromCart = async (
   userId: string,
   productId: string
-): Promise<boolean> => {
+): Promise<Cart | null> => {
   const cart = await cartRepository.findCartByUserId(userId);
   if (!cart) {
-    return false;
+    return null;
   }
 
   const itemIndex = cart.items.findIndex(
     (item) => item.productId === productId
   );
   if (itemIndex === -1) {
-    return false;
+    return cart;
   }
 
   cart.items.splice(itemIndex, 1);
   await cartRepository.saveCart(cart);
-  return true;
+  return cart;
 };
 
 const clearCart = async (userId: string): Promise<boolean> => {
