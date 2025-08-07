@@ -3,19 +3,22 @@ import { AuthenticatedRequest } from "@domain/src/ports/auth-types";
 import cartService from "../services/cart.service";
 
 const addToCart = async (req: Request, res: Response): Promise<Response> => {
-  const { productId, productName, productPrice, quantity } = req.body;
   const userId = (req as AuthenticatedRequest).user.id;
+  const { productId, quantity } = req.body;
+
+  if (!productId || !quantity) {
+    return res.status(400).json({
+      ok: false,
+      message: "Faltan campos obligatorios: productId, quantity",
+    });
+  }
 
   try {
-    const request = {
+    const updatedCart = await cartService.addToCart(
       userId,
       productId,
-      productName,
-      productPrice,
-      quantity,
-    };
-    const updatedCart = await cartService.addToCart(request);
-
+      quantity
+    );
     return res.status(200).json({ ok: true, payload: updatedCart });
   } catch (error) {
     return res
@@ -24,20 +27,14 @@ const addToCart = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-const getCartContent = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+const getCart = async (req: Request, res: Response): Promise<Response> => {
   const userId = (req as AuthenticatedRequest).user.id;
-
   try {
-    const cart = await cartService.getCartContent(userId);
-
+    const cart = await cartService.getCartByUserId(userId);
     return res.status(200).json({ ok: true, payload: cart });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, message: "Error interno del servidor" });
+    const errorMessage = (error as Error).message;
+    return res.status(500).json({ ok: false, message: errorMessage });
   }
 };
 
@@ -91,4 +88,4 @@ const clearCart = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-export default { addToCart, getCartContent, removeFromCart, clearCart };
+export default { addToCart, getCart, removeFromCart, clearCart };
