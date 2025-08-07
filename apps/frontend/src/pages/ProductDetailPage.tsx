@@ -10,7 +10,7 @@ export const ProductDetailPage: FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const {
     data: product,
@@ -23,7 +23,7 @@ export const ProductDetailPage: FC = () => {
   });
 
   const { mutate, isPending: isAdding } = useMutation({
-    mutationFn: (data: AddToCartRequest) => addToCart(data, token!),
+    mutationFn: (data: AddToCartRequest) => addToCart(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       alert("Producto añadido al carrito!");
@@ -42,8 +42,7 @@ export const ProductDetailPage: FC = () => {
     }
 
     if (product && productId) {
-      const requestData = {
-        userId: "AUTH_TOKEN",
+      const requestData: AddToCartRequest = {
         productId: productId,
         productName: product.name,
         productPrice: product.price,
