@@ -4,19 +4,22 @@ import { getCart } from "../services/cart.service";
 import { getProductsByIds } from "src/services/product.service";
 import type { Cart } from "@domain/entities/Cart";
 import type { Product } from "@domain/entities/Product";
+import { useAuth } from "src/context/auth.context";
 
 interface CombinedCartItem extends Product {
   quantity: number;
 }
 
 export const CartPage: React.FC = () => {
+  const { token, isAuthenticated } = useAuth();
   const {
     data: cartData,
     isLoading: isCartLoading,
     isError: isCartError,
   } = useQuery<Cart>({
     queryKey: ["cart"],
-    queryFn: getCart,
+    queryFn: () => getCart(token!),
+    enabled: isAuthenticated,
   });
 
   const productIds = cartData?.items?.map((item) => item.productId) || [];
@@ -28,16 +31,22 @@ export const CartPage: React.FC = () => {
   } = useQuery<Product[]>({
     queryKey: ["productsInCart", productIds],
     queryFn: () => getProductsByIds(productIds),
-    enabled: !!cartData && productIds.length > 0,
+    enabled: !!cartData && productIds.length > 0 && isAuthenticated,
   });
 
   const combinedData: CombinedCartItem[] =
-    products?.map((product) => {
-      const cartItem = cartData?.items.find(
-        (item) => item.productId === product.id
-      );
-      return { ...product, quantity: cartItem?.quantity || 0 };
-    }) || [];
+    (cartData?.items
+      .map((cartItem) => {
+        const product = products?.find(
+          (product) => product.id === cartItem.productId
+        );
+
+        if (product) {
+          return { ...product, quantity: cartItem.quantity };
+        }
+        return null;
+      })
+      .filter(Boolean) as CombinedCartItem[]) || [];
 
   const subtotal = combinedData.reduce(
     (total, item) => total + item.price * item.quantity,
