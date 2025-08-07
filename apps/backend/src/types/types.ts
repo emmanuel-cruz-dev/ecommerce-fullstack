@@ -17,7 +17,6 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export interface AddToCartRequest {
-  userId: string;
   productId: string;
   productName: string;
   productPrice: number;
