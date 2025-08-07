@@ -1,13 +1,18 @@
 import api from "./api";
+import type { AddToCartRequest } from "../../../backend/src/types/types";
 
-export const addToCart = async (productId: string) => {
-  // TODO agregar token real
-  const token = "MY_AUTH_TOKEN";
+const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
-  const response = await api.post(
-    `/cart/add`,
-    { productId },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+export const addToCart = async (request: AddToCartRequest) => {
+  const response = await api.post(`/cart`, request, {
+    headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
+  });
   return response.data;
+};
+
+export const getCart = async () => {
+  const response = await api.get(`/cart`, {
+    headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
+  });
+  return response.data.payload;
 };
