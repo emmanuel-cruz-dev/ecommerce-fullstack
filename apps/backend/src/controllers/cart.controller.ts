@@ -46,18 +46,16 @@ const removeFromCart = async (
   const userId = (req as AuthenticatedRequest).user.id;
 
   try {
-    const success = await cartService.removeFromCart(userId, productId);
+    const updatedCart = await cartService.removeFromCart(userId, productId);
 
-    if (!success) {
+    if (!updatedCart) {
       return res.status(404).json({
         ok: false,
-        message: "El producto no se encontró en el carrito",
+        message: "El carrito del usuario no se encontró",
       });
     }
 
-    return res
-      .status(200)
-      .json({ ok: true, message: "Producto eliminado del carrito" });
+    return res.status(200).json({ ok: true, payload: updatedCart });
   } catch (error) {
     return res
       .status(500)
