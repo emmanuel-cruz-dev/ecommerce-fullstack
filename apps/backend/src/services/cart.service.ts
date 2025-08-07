@@ -1,14 +1,12 @@
-import { CartItem } from "@domain/src/entities/Cart";
-import cartRepository from "../data/cart.repository";
 import { v4 as uuid } from "uuid";
-import { AddToCartRequest } from "src/types/types";
+import cartRepository from "../data/cart.repository";
+import { Cart, CartItem } from "@domain/src/entities/Cart";
 
-const getCartContent = async (userId: string) => {
-  return await cartRepository.findCartByUserId(userId);
-};
-
-const addToCart = async (request: AddToCartRequest) => {
-  const { userId, productId, quantity } = request;
+const addToCart = async (
+  userId: string,
+  productId: string,
+  quantity: number
+): Promise<Cart> => {
   let cart = await cartRepository.findCartByUserId(userId);
 
   if (!cart) {
@@ -34,17 +32,44 @@ const addToCart = async (request: AddToCartRequest) => {
   return await cartRepository.saveCart(cart);
 };
 
-const clearCart = async (userId: string) => {
-  return await cartRepository.clearCart(userId);
+const getCartByUserId = async (userId: string): Promise<Cart | null> => {
+  return cartRepository.findCartByUserId(userId);
 };
 
-const removeFromCart = async (userId: string, productId: string) => {
-  return await cartRepository.removeCartItem(userId, productId);
+const removeFromCart = async (
+  userId: string,
+  productId: string
+): Promise<boolean> => {
+  const cart = await cartRepository.findCartByUserId(userId);
+  if (!cart) {
+    return false;
+  }
+
+  const itemIndex = cart.items.findIndex(
+    (item) => item.productId === productId
+  );
+  if (itemIndex === -1) {
+    return false;
+  }
+
+  cart.items.splice(itemIndex, 1);
+  await cartRepository.saveCart(cart);
+  return true;
+};
+
+const clearCart = async (userId: string): Promise<boolean> => {
+  const cart = await cartRepository.findCartByUserId(userId);
+  if (!cart) {
+    return false;
+  }
+  cart.items = [];
+  await cartRepository.saveCart(cart);
+  return true;
 };
 
 export default {
-  getCartContent,
   addToCart,
-  clearCart,
+  getCartByUserId,
   removeFromCart,
+  clearCart,
 };
