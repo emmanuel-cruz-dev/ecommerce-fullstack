@@ -5,7 +5,6 @@ import { User } from "@domain/src/entities/User";
 
 const signUp = async (req: Request, res: Response): Promise<Response> => {
   const { email, password, username, role } = req.body;
-
   if (!email || !password || !username) {
     return res.status(400).json({
       ok: false,
@@ -20,8 +19,15 @@ const signUp = async (req: Request, res: Response): Promise<Response> => {
       username,
       role: role || "user",
     };
-    const token = await authService.signUp(newUser);
-    return res.status(201).json({ ok: true, payload: { token } });
+    const { accessToken, refreshToken } = await authService.signUp(newUser);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(201).json({ ok: true, payload: { accessToken } });
   } catch (error) {
     const errorMessage = (error as Error).message;
     return res.status(409).json({ ok: false, message: errorMessage });
@@ -30,7 +36,6 @@ const signUp = async (req: Request, res: Response): Promise<Response> => {
 
 const signIn = async (req: Request, res: Response): Promise<Response> => {
   const { email, password } = req.body;
-
   if (!email || !password) {
     return res.status(400).json({
       ok: false,
@@ -39,8 +44,18 @@ const signIn = async (req: Request, res: Response): Promise<Response> => {
   }
 
   try {
-    const token = await authService.signIn(email, password);
-    return res.status(200).json({ ok: true, payload: { token } });
+    const { accessToken, refreshToken } = await authService.signIn(
+      email,
+      password
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ ok: true, payload: { accessToken } });
   } catch (error) {
     const errorMessage = (error as Error).message;
     return res.status(401).json({ ok: false, message: errorMessage });
@@ -56,7 +71,6 @@ const getMe = async (req: Request, res: Response): Promise<Response> => {
         .status(404)
         .json({ ok: false, message: "Usuario no encontrado" });
     }
-
     const { password, ...userWithoutPassword } = user;
     return res.status(200).json({ ok: true, payload: userWithoutPassword });
   } catch (error) {
@@ -66,8 +80,34 @@ const getMe = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
+const refresh = async (req: Request, res: Response): Promise<Response> => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    return res
+      .status(401)
+      .json({ ok: false, message: "Refresh token no proporcionado." });
+  }
+
+  try {
+    const { accessToken, refreshToken: newRefreshToken } =
+      await authService.refreshToken(refreshToken);
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.status(200).json({ ok: true, payload: { accessToken } });
+  } catch (error) {
+    res.clearCookie("refreshToken");
+    return res
+      .status(401)
+      .json({ ok: false, message: (error as Error).message });
+  }
+};
+
 export default {
   signUp,
   signIn,
   getMe,
+  refresh,
 };
