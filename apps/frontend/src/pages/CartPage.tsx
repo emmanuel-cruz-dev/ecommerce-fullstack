@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCart, removeFromCart } from "../services/cart.service";
+import { getCart, removeFromCart, clearCart } from "../services/cart.service";
 import { getProductsByIds } from "src/services/product.service";
 import type { Cart } from "@domain/entities/Cart";
 import type { Product } from "@domain/entities/Product";
@@ -61,6 +61,17 @@ export const CartPage: React.FC = () => {
     },
   });
 
+  const clearCartMutation = useMutation({
+    mutationFn: clearCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (error) => {
+      console.error("Error al vaciar el carrito:", error);
+      alert("No se pudo vaciar el carrito.");
+    },
+  });
+
   const subtotal = combinedData.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -68,6 +79,10 @@ export const CartPage: React.FC = () => {
 
   const handleRemoveClick = (productId: string) => {
     removeMutation.mutate(productId);
+  };
+
+  const handleClearCartClick = () => {
+    clearCartMutation.mutate();
   };
 
   if (isAuthLoading || isCartLoading || isProductsLoading) {
@@ -108,6 +123,7 @@ export const CartPage: React.FC = () => {
     <article className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Tu Carrito</h1>
       {removeMutation.isPending && <p>Eliminando producto...</p>}
+      {clearCartMutation.isPending && <p>Vaciando carrito...</p>}
       <article className="bg-white shadow-md rounded-lg p-6">
         <ul>
           {combinedData.map((item) => (
@@ -148,6 +164,13 @@ export const CartPage: React.FC = () => {
             <p>${subtotal.toFixed(2)}</p>
           </div>
         </footer>
+        <button
+          className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-md shadow-sm transition-colors duration-200 mt-3"
+          onClick={handleClearCartClick}
+          disabled={clearCartMutation.isPending || combinedData.length === 0}
+        >
+          Vaciar Carrito
+        </button>
         <button className="mt-6 w-full bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-colors text-lg">
           Finalizar Compra
         </button>
