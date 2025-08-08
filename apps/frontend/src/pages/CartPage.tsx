@@ -4,7 +4,6 @@ import { getCart, removeFromCart, clearCart } from "../services/cart.service";
 import { getProductsByIds } from "src/services/product.service";
 import type { Cart } from "@domain/entities/Cart";
 import type { Product } from "@domain/entities/Product";
-//import { useAuth } from "src/context/auth.context";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import { useAuth } from "src/hooks/useAuth";
 
