@@ -1,4 +1,3 @@
-import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCart, removeFromCart, clearCart } from "../services/cart.service";
 import { getProductsByIds } from "src/services/product.service";
@@ -6,12 +5,9 @@ import type { Cart } from "@domain/entities/Cart";
 import type { Product } from "@domain/entities/Product";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import { useAuth } from "src/hooks/useAuth";
+import type { CombinedCartItem } from "src/types/cart";
 
-interface CombinedCartItem extends Product {
-  quantity: number;
-}
-
-export const CartPage: React.FC = () => {
+export function CartPage() {
   const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const {
@@ -177,4 +173,4 @@ export const CartPage: React.FC = () => {
       </article>
     </article>
   );
-};
+}
