@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/auth.context";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "src/hooks/useAuth";
 
 export const RegisterPage: React.FC = () => {
   const [username, setUserName] = useState("");
