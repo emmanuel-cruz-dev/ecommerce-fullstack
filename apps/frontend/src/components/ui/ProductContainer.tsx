@@ -1,10 +1,6 @@
 import { type FC } from "react";
-import type { Product } from "@domain/entities/Product";
 import { ProductCard } from "./ProductCard";
-
-interface ProductContainerProps {
-  products: Product[];
-}
+import type { ProductContainerProps } from "src/types/product";
 
 export const ProductContainer: FC<ProductContainerProps> = ({ products }) => {
   if (!products || products.length === 0) {
