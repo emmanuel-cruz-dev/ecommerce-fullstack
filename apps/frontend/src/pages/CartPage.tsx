@@ -62,11 +62,6 @@ export function CartPage() {
 
   const clearCartMutation = useMutation({
     mutationFn: clearCart,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-      alert("¡Compra finalizada con éxito! El carrito ha sido vaciado.");
-      navigate("/");
-    },
     onError: (error) => {
       console.error("Error al vaciar el carrito:", error);
       alert("No se pudo vaciar el carrito.");
@@ -83,11 +78,22 @@ export function CartPage() {
   };
 
   const handleClearCartClick = () => {
-    clearCartMutation.mutate();
+    clearCartMutation.mutate(undefined, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        alert("¡El carrito ha sido vaciado!");
+      },
+    });
   };
 
   const handleCheckout = () => {
-    clearCartMutation.mutate();
+    clearCartMutation.mutate(undefined, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        alert("¡Compra finalizada con éxito! El carrito ha sido vaciado.");
+        navigate("/");
+      },
+    });
   };
 
   if (isAuthLoading || isCartLoading || isProductsLoading) {
