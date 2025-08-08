@@ -44,6 +44,8 @@ const mockProducts: Product[] = [
     description: "Una laptop de alto rendimiento para gaming.",
     price: 1500,
     stock: 10,
+    imageUrl:
+      "https://www.acerstore.cl/cdn/shop/files/1_PNR-0988.jpg?v=1748957971&width=533",
     category: "Electronics",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -54,6 +56,8 @@ const mockProducts: Product[] = [
     description: "El nuevo teléfono con la mejor cámara.",
     price: 800,
     stock: 5,
+    imageUrl:
+      "https://image.made-in-china.com/202f0j00kvdiStBcLCfl/Global-X200-4G-LTE-Android-Smartphone-6-5-Inch-Unlocked-Quad-Core-Cell-Phone-Low-Price-3G-4G-Features.jpg",
     category: "Electronics",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -64,6 +68,8 @@ const mockProducts: Product[] = [
     description: "Teclado con switches de alta durabilidad.",
     price: 120,
     stock: 0,
+    imageUrl:
+      "https://noblex.com.ar/media/catalog/product/cache/c8f6a96bef9e9f64cd4973587df2520f/n/b/nbx_pop_digital_1200x922_mesa_de_trabajo_1_copia_2_1.jpg",
     category: "Peripherals",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -74,6 +80,8 @@ const mockProducts: Product[] = [
     description: "Diseñado para largas sesiones de trabajo.",
     price: 50,
     stock: 25,
+    imageUrl:
+      "https://cdn.v2.tiendanegocio.com/gallery/31960/img_31960_2u2lax7lflm7vgnku3.jpeg",
     category: "Peripherals",
     createdAt: new Date(),
     updatedAt: new Date(),
