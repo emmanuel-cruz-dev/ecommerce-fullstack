@@ -1,10 +1,36 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { Product } from "@domain/entities/Product";
 import { ProductContainer } from "./ProductContainer";
+import { BrowserRouter as Router } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthContext } from "src/context/auth.context";
+
+const queryClient = new QueryClient();
 
 const meta: Meta<typeof ProductContainer> = {
   component: ProductContainer,
   title: "Components/ProductGrid",
+  decorators: [
+    (Story) => (
+      <Router>
+        <QueryClientProvider client={queryClient}>
+          <AuthContext.Provider
+            value={{
+              isAuthenticated: true,
+              user: null,
+              token: "mock-token",
+              login: () => Promise.resolve(),
+              logout: () => {},
+              register: () => Promise.resolve(),
+              isLoading: false,
+            }}
+          >
+            <Story />
+          </AuthContext.Provider>
+        </QueryClientProvider>
+      </Router>
+    ),
+  ],
 };
 
 export default meta;
