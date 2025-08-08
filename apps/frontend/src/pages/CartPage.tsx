@@ -6,10 +6,13 @@ import type { Product } from "@domain/entities/Product";
 import LoadingSpinner from "src/components/common/LoadingSpinner";
 import { useAuth } from "src/hooks/useAuth";
 import type { CombinedCartItem } from "src/types/cart";
+import { useNavigate } from "react-router-dom";
 
 export function CartPage() {
   const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const navigate = useNavigate();
+
   const {
     data: cartData,
     isLoading: isCartLoading,
@@ -61,6 +64,8 @@ export function CartPage() {
     mutationFn: clearCart,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      alert("¡Compra finalizada con éxito! El carrito ha sido vaciado.");
+      navigate("/");
     },
     onError: (error) => {
       console.error("Error al vaciar el carrito:", error);
@@ -78,6 +83,10 @@ export function CartPage() {
   };
 
   const handleClearCartClick = () => {
+    clearCartMutation.mutate();
+  };
+
+  const handleCheckout = () => {
     clearCartMutation.mutate();
   };
 
@@ -167,7 +176,11 @@ export function CartPage() {
         >
           Vaciar Carrito
         </button>
-        <button className="mt-6 w-full bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-colors text-lg">
+        <button
+          className="mt-6 w-full bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-colors text-lg"
+          onClick={handleCheckout}
+          disabled={clearCartMutation.isPending || combinedData.length === 0}
+        >
           Finalizar Compra
         </button>
       </article>
