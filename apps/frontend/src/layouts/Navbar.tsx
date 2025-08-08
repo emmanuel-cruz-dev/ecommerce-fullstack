@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "src/context/auth.context";
+import { useAuth } from "src/hooks/useAuth";
 
 export const Navbar: FC = () => {
   const { isAuthenticated, logout } = useAuth();
