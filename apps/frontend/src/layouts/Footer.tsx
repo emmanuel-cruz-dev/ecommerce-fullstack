@@ -1,6 +1,4 @@
-import { type FC } from "react";
-
-export const Footer: FC = () => {
+export function Footer() {
   return (
     <footer className="bg-gray-800 text-white p-4 mt-auto">
       <article className="container mx-auto text-center">
@@ -11,4 +9,4 @@ export const Footer: FC = () => {
       </article>
     </footer>
   );
-};
+}
