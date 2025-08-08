@@ -1,6 +1,4 @@
-import React from "react";
-
-const LoadingSpinner: React.FC = () => {
+function LoadingSpinner() {
   return (
     <article
       style={{
@@ -30,6 +28,6 @@ const LoadingSpinner: React.FC = () => {
       </style>
     </article>
   );
-};
+}
 
 export default LoadingSpinner;
