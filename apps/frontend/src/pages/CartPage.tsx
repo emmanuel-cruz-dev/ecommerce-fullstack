@@ -1,17 +1,19 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getCart } from "../services/cart.service";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getCart, removeFromCart } from "../services/cart.service";
 import { getProductsByIds } from "src/services/product.service";
 import type { Cart } from "@domain/entities/Cart";
 import type { Product } from "@domain/entities/Product";
 import { useAuth } from "src/context/auth.context";
+import LoadingSpinner from "src/components/common/LoadingSpinner";
 
 interface CombinedCartItem extends Product {
   quantity: number;
 }
 
 export const CartPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const {
     data: cartData,
     isLoading: isCartLoading,
@@ -48,23 +50,38 @@ export const CartPage: React.FC = () => {
       })
       .filter(Boolean) as CombinedCartItem[]) || [];
 
+  const removeMutation = useMutation({
+    mutationFn: removeFromCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (error) => {
+      console.error("Error al eliminar el producto del carrito:", error);
+      alert("No se pudo eliminar el producto del carrito.");
+    },
+  });
+
   const subtotal = combinedData.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  if (isCartLoading || isProductsLoading) {
-    return (
-      <article className="flex items-center justify-center h-screen">
-        <p className="text-xl text-gray-500">Cargando carrito...</p>
-      </article>
-    );
+  const handleRemoveClick = (productId: string) => {
+    removeMutation.mutate(productId);
+  };
+
+  if (isAuthLoading || isCartLoading || isProductsLoading) {
+    return <LoadingSpinner />;
   }
 
   if (isCartError || isProductsError) {
     return (
-      <article className="flex items-center justify-center h-screen">
-        <p className="text-xl text-red-500">Error al cargar el carrito.</p>
+      <article className="container">
+        <h1>Error</h1>
+        <p>
+          Hubo un problema al cargar el carrito. Por favor, inténtelo de nuevo
+          más tarde.
+        </p>
       </article>
     );
   }
@@ -78,9 +95,19 @@ export const CartPage: React.FC = () => {
     );
   }
 
+  if (!isAuthenticated) {
+    return (
+      <article className="container">
+        <h1>Carrito</h1>
+        <p>Por favor, inicia sesión para ver tu carrito.</p>
+      </article>
+    );
+  }
+
   return (
     <article className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Tu Carrito</h1>
+      {removeMutation.isPending && <p>Eliminando producto...</p>}
       <article className="bg-white shadow-md rounded-lg p-6">
         <ul>
           {combinedData.map((item) => (
@@ -104,6 +131,13 @@ export const CartPage: React.FC = () => {
                 <p className="font-semibold">
                   Subtotal: ${(item.price * item.quantity).toFixed(2)}
                 </p>
+                <button
+                  className="w-full border border-black rounded-md bg-gray-100 hover:bg-gray-300 mt-2"
+                  onClick={() => handleRemoveClick(item.id)}
+                  disabled={removeMutation.isPending}
+                >
+                  Eliminar
+                </button>
               </aside>
             </li>
           ))}
