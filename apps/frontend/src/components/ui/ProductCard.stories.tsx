@@ -1,10 +1,36 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ProductCard } from "./ProductCard";
 import type { Product } from "@domain/entities/Product";
+import { BrowserRouter as Router } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthContext } from "src/context/auth.context";
+
+const queryClient = new QueryClient();
 
 const meta: Meta<typeof ProductCard> = {
   component: ProductCard,
   title: "Components/ProductCard",
+  decorators: [
+    (Story) => (
+      <Router>
+        <QueryClientProvider client={queryClient}>
+          <AuthContext.Provider
+            value={{
+              isAuthenticated: true,
+              user: null,
+              token: "mock-token",
+              login: () => Promise.resolve(),
+              logout: () => {},
+              register: () => Promise.resolve(),
+              isLoading: false,
+            }}
+          >
+            <Story />
+          </AuthContext.Provider>
+        </QueryClientProvider>
+      </Router>
+    ),
+  ],
 };
 
 export default meta;
@@ -36,6 +62,27 @@ export const OutOfStock: Story = {
       ...mockProduct,
       name: "Laptop Gamer (Sin Stock)",
       stock: 0,
+    },
+  },
+};
+
+export const AddingToCart: Story = {
+  args: {
+    product: mockProduct,
+  },
+  parameters: {
+    msw: {
+      handlers: {
+        post: {
+          url: "/api/cart",
+          delay: 1000,
+          response: {
+            payload: {
+              items: [{ productId: "1", quantity: 1 }],
+            },
+          },
+        },
+      },
     },
   },
 };
