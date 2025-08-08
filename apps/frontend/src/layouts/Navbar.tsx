@@ -1,8 +1,7 @@
-import type { FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "src/hooks/useAuth";
 
-export const Navbar: FC = () => {
+export function Navbar() {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -21,16 +20,18 @@ export const Navbar: FC = () => {
           <Link to="/" className="text-gray-300 hover:text-white">
             Productos
           </Link>
-          <Link to="/cart" className="text-gray-300 hover:text-white">
-            Carrito
-          </Link>
           {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              className="text-gray-300 hover:text-white"
-            >
-              Cerrar Sesión
-            </button>
+            <>
+              <Link to="/cart" className="text-gray-300 hover:text-white">
+                Carrito
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-gray-300 hover:text-white"
+              >
+                Cerrar Sesión
+              </button>
+            </>
           ) : (
             <>
               <Link to="/login" className="text-gray-300 hover:text-white">
@@ -45,4 +46,4 @@ export const Navbar: FC = () => {
       </article>
     </nav>
   );
-};
+}
