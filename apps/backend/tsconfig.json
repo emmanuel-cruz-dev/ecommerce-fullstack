@@ -15,6 +15,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../domain/src/**/*"],
   "exclude": ["node_modules"]
 }
