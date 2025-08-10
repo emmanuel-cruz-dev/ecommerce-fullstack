@@ -8,7 +8,10 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@domain/*": ["../../domain/src/*"]
+      // Rutas de acceso corregidas para que funcionen
+      "@domain/*": ["../../domain/src/*"],
+      "@backend-types/*": ["../../apps/backend/src/types/*"],
+      "@/*": ["src/*"]
     },
 
     /* Bundler mode */
