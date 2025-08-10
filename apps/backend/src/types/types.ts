@@ -1,5 +1,5 @@
 import { UserRole } from "@domain/src/entities/User";
-import { Request } from "express";
+import type { Request } from "express";
 
 export interface AuthPayload {
   id: string;
