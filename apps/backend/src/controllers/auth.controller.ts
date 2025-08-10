@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "@domain/src/ports/auth-types";
 import authService from "../services/auth.service";
-import { User } from "@domain/src/entities/User";
+import { User } from "src/types/types";
 
 const signUp = async (req: Request, res: Response): Promise<Response> => {
   const { email, password, username, role } = req.body;
