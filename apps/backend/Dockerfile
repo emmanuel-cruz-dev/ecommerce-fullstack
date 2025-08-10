@@ -1,34 +1,56 @@
-# Dockerfile para Backend (apps/backend/Dockerfile)
-FROM node:20
+# --- Etapa 1: Preparación del contexto de construcción ---
+# Usamos una imagen ligera de Node.js v20 para la preparación
+FROM node:20 AS context-builder
 
-# Instalar curl para health checks
-RUN apk add --no-cache curl
+# Establecemos el directorio de trabajo
+WORKDIR /usr/src/app
 
-WORKDIR /app
+# Copiamos las carpetas de las aplicaciones y del dominio
+COPY ./apps ./apps
+COPY ./domain ./domain
 
-# Copiar package.json del backend
-COPY apps/backend/package*.json ./backend/
+# --- Etapa 2: Construcción del backend ---
+# Usamos la misma imagen base de Node.js v20
+FROM node:20 AS backend-builder
 
-# Copiar package.json del domain
-COPY domain/package*.json ./domain/
+# Establecemos el directorio de trabajo
+WORKDIR /usr/src/app
 
-# Instalar dependencias del backend
-WORKDIR /app/backend
-RUN npm ci
+# Instalamos curl
+RUN apt-get update && apt-get install -y curl
 
-# Instalar dependencias del domain
-WORKDIR /app/domain
-RUN npm ci
+# Copiamos los archivos de la etapa anterior
+COPY --from=context-builder /usr/src/app/apps/backend ./apps/backend
+COPY --from=context-builder /usr/src/app/domain ./domain
+COPY --from=context-builder /usr/src/app/apps/backend/package*.json ./apps/backend/
+COPY --from=context-builder /usr/src/app/domain/package*.json ./domain/
 
-# Volver al directorio de trabajo del backend
-WORKDIR /app/backend
+# Instalamos las dependencias
+WORKDIR /usr/src/app/apps/backend
+RUN npm install
 
-# Copiar el código fuente del backend y domain
-COPY apps/backend/ ./
-COPY domain/ ../domain/
+# Copiamos el código fuente
+COPY --from=context-builder /usr/src/app/apps/backend ./
+COPY --from=context-builder /usr/src/app/domain ./domain
 
-# Exponer puerto
+# Compilamos el código
+RUN npm run build
+
+# --- Etapa 3: Producción del backend ---
+# Usamos una imagen de Node.js solo para producción para tener un contenedor más ligero
+FROM node:20-slim
+
+# Establecemos el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copiamos la aplicación construida desde la etapa anterior
+COPY --from=backend-builder /usr/src/app/apps/backend/dist ./dist
+COPY --from=backend-builder /usr/src/app/apps/backend/node_modules ./node_modules
+COPY --from=backend-builder /usr/src/app/apps/backend/package*.json ./
+COPY --from=backend-builder /usr/src/app/domain ./domain
+
+# Exponemos el puerto
 EXPOSE 3000
 
-# Comando para iniciar en modo desarrollo
-CMD ["npm", "run", "dev"]
+# Comando para iniciar la aplicación
+CMD ["npm", "run", "start:prod"]
