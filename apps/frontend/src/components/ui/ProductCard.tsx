@@ -4,7 +4,7 @@ import type { ProductCardProps } from "src/types/product";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCart } from "src/services/cart.service";
 import { useAuth } from "src/hooks/useAuth";
-import type { AddToCartRequest } from "../../../../backend/src/types/types";
+import type { AddToCartRequest } from "@backend-types/types";
 
 export const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const queryClient = useQueryClient();
