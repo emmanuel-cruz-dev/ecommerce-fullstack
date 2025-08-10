@@ -24,8 +24,9 @@ FROM nginx:alpine
 # al directorio de Nginx.
 COPY --from=builder /usr/src/app/apps/frontend/dist /usr/share/nginx/html
 
-# Copia la configuración de Nginx.
-COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+# Configuración de Nginx para el frontend
+# Creamos un archivo de configuración simple directamente en el Dockerfile
+RUN echo "server { listen 80; location / { root /usr/share/nginx/html; index index.html; try_files \$uri \$uri/ /index.html; } }" > /etc/nginx/conf.d/default.conf
 
 # Expone el puerto 80 que Nginx usa por defecto.
 EXPOSE 80
