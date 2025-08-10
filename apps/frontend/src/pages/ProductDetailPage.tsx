@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { AddToCartRequest } from "../../../backend/src/types/types";
 import { getProductById } from "../services/product.service";
 import { addToCart } from "src/services/cart.service";
 import { useAuth } from "src/hooks/useAuth";
+import type { AddToCartRequest } from "@backend-types/types";
 
 export function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>();
