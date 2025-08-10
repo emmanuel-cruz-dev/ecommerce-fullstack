@@ -1,5 +1,5 @@
 import api from "./api";
-import type { AddToCartRequest } from "../../../backend/src/types/types";
+import type { AddToCartRequest } from "@backend-types/types";
 import type { Cart } from "@domain/entities/Cart";
 
 export const addToCart = async (request: AddToCartRequest) => {
