@@ -41,10 +41,14 @@ services:
   # Frontend
   frontend:
     build:
-      context: ./apps/frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
     ports:
-      - "80:80"
+      - "5173:80"
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    container_name: frontend
     depends_on:
       - backend
     networks:
