@@ -1,27 +1,34 @@
-FROM node:20
+# Usa una imagen base de Node.js para la fase de construcción.
+# Esto es para instalar dependencias y construir la aplicación.
+FROM node:20 AS builder
 
-WORKDIR /app
-
-# Copiar package.json y package-lock.json
-COPY package*.json ./
-
-# Instalar dependencias
-RUN npm ci
-
-# Copiar el código fuente
+# Copia todo el contexto del proyecto a una carpeta temporal.
+# Esto asegura que todas las carpetas compartidas estén disponibles.
+WORKDIR /usr/src/app
 COPY . .
 
-# Construir la aplicación
+# Establece el directorio de trabajo dentro del frontend.
+# A partir de ahora, todas las rutas relativas serán desde esta carpeta.
+WORKDIR /usr/src/app/apps/frontend
+
+# Instala todas las dependencias. El comando 'ci' es más seguro para CI/CD.
+RUN npm ci
+
+# Construye la aplicación. Esto ejecutará 'tsc' y 'vite build'.
 RUN npm run build
 
-# Etapa de producción
+# Usa una imagen más ligera de Nginx para servir la aplicación estática en producción.
 FROM nginx:alpine
 
-# Copiar archivos construidos al directorio de nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copia la salida de la construcción desde la imagen 'builder'
+# al directorio de Nginx.
+COPY --from=builder /usr/src/app/apps/frontend/dist /usr/share/nginx/html
 
-# Copiar configuración personalizada de nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copia la configuración de Nginx.
+COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Exponer puerto
+# Expone el puerto 80 que Nginx usa por defecto.
 EXPOSE 80
+
+# Comando para iniciar Nginx.
+CMD ["nginx", "-g", "daemon off;"]
