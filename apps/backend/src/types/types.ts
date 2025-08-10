@@ -1,5 +1,14 @@
-import { UserRole } from "@domain/src/entities/User";
 import type { Request } from "express";
+
+export type UserRole = "admin" | "user";
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}
 
 export interface AuthPayload {
   id: string;
