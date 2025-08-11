@@ -15,7 +15,7 @@ services:
     networks:
       - app-network
 
-  # Backend (incluye acceso al domain)
+  # Backend
   backend:
     build:
       context: .
@@ -38,7 +38,7 @@ services:
       - ./apps/backend/src:/app/backend/src
       - ./domain:/app/domain
 
-  # Frontend (Volúmenes eliminados)
+  # Frontend
   frontend:
     build:
       context: .
@@ -53,7 +53,7 @@ services:
     environment:
       - REACT_APP_API_URL=http://localhost:3000
 
-  # Nginx Reverse Proxy (Opcional pero recomendado)
+  # Nginx Reverse Proxy
   reverse-proxy:
     image: nginx:alpine
     volumes:
