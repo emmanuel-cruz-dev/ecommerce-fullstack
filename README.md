@@ -24,40 +24,65 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 📦 proyecto
 ├── 📁 apps/
 │   ├── 📁 backend/
+│   │   ├── 📁 src/
+│   │   │   ├── 📁 controllers/
+│   │   │   ├── 📁 data/
+│   │   │   ├── 📁 database/
+│   │   │   ├── 📁 errors/
+│   │   │   ├── 📁 middlewares/
+│   │   │   ├── 📁 routes/
+│   │   │   ├── 📁 services/
+│   │   │   ├── 📁 types/
+│   │   │   └── 📄 app.ts
+│   │   ├── 🔒 package-lock.json
+│   │   ├── 📋 package.json
+│   │   ├── 📄 tsconfig.json
+│   │   └── ⚡ vitest.config.ts
 │   └── 📁 frontend/
-├── 📁 domain/
-│   ├── 📁 src/
-│   │   ├── 📁 entities/
-│   │   │   ├── 📄 Cart.ts
-│   │   │   ├── 📄 Product.ts
-│   │   │   └── 📄 User.ts
-│   │   ├── 📁 repositories/
-│   │   │   ├── 📄 cart-repository.ts
-│   │   │   ├── 📄 product-repository.ts
-│   │   │   └── 📄 user-repository.ts
-│   │   └── 📁 use-cases/
-│   │       ├── 📄 add-to-cart.ts
-│   │       ├── 📄 create-product.ts
-│   │       └── 📄 user-register.ts
-│   ├── 📁 tests/
-│   │   ├── 📁 mocks/
-│   │   │   ├── 📄 cart-repository-mock.ts
-│   │   │   ├── 📄 product-repository-mock.ts
-│   │   │   └── 📄 user-repository-mock.ts
-│   │   └── 📁 use-cases/
-│   │       ├── 📄 add-to-cart.spec.ts
-│   │       ├── 📄 create-product.spec.ts
-│   │       └── 📄 user-register.spec.ts
-│   ├── 📄 package.json
-│   ├── 📄 package-lock.json
-│   └── ⚡ vitest.config.ts
-├── 📁 node_modules/
-├── 📄 .gitignore
-├── 📄 package.json
-├── 📄 package-lock.json
-└── 📄 README.md
+│       ├── 📁 .storybook/
+│       ├── 📁 public/
+│       ├── 📁 src/
+│       │   ├── 📁 assets/
+│       │   ├── 📁 components/
+│       │   ├── 📁 context/
+│       │   ├── 📁 hooks/
+│       │   ├── 📁 layouts/
+│       │   ├── 📁 pages/
+│       │   ├── 📁 services/
+│       │   ├── 📁 types/
+│       │   ├── ⚛️ App.tsx
+│       │   ├── 🎨 index.css
+│       │   ├── ⚛️ main.tsx
+│       │   └── 📄 vite-env.d.ts
+│       ├── 🚫 .gitignore
+│       ├── ⚙️ eslint.config.js
+│       ├── 🌐 index.html
+│       ├── 🔒 package-lock.json
+│       ├── 📋 package.json
+│       ├── ⚙️ postcss.config.js
+│       ├── 📖 README.md
+│       ├── 🎨 tailwind.config.js
+│       ├── 📄 tsconfig.app.json
+│       ├── 📄 tsconfig.json
+│       ├── 📄 tsconfig.node.json
+│       ├── ⚡ vite.config.ts
+│       └── ⚡ vitest.shims.d.ts
+└── 📁 domain/
+    ├── 📁 src/
+    │   ├── 📁 entities/
+    │   ├── 📁 infrastructure/
+    │   ├── 📁 mocks/
+    │   ├── 📁 ports/
+    │   ├── 📁 repositories/
+    │   ├── 📁 use-cases/
+    │   ├── 🔒 package-lock.json
+    │   └── 📋 package.json
+    ├── 🚫 .gitignore
+    ├── 🔒 package-lock.json
+    ├── 📋 package.json
+    ├── 📖 README.md
+    └── ⚡ vitest.config.ts
 ```
-
 ---
 
 ## 🔧 Tecnologías clave
