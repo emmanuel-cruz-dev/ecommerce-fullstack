@@ -24,7 +24,6 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 📦 proyecto
 ├── 📁 apps/
 │   ├── 📁 backend/
-│   │   ├── 📁 node_modules/
 │   │   ├── 📁 src/
 │   │   │   ├── 📁 controllers/
 │   │   │   ├── 📁 data/
@@ -35,14 +34,12 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 │   │   │   ├── 📁 services/
 │   │   │   ├── 📁 types/
 │   │   │   └── 📄 app.ts
-│   │   ├── ⚙️ .env
 │   │   ├── 🔒 package-lock.json
 │   │   ├── 📋 package.json
 │   │   ├── 📄 tsconfig.json
 │   │   └── ⚡ vitest.config.ts
 │   └── 📁 frontend/
 │       ├── 📁 .storybook/
-│       ├── 📁 node_modules/
 │       ├── 📁 public/
 │       ├── 📁 src/
 │       │   ├── 📁 assets/
@@ -57,7 +54,6 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 │       │   ├── 🎨 index.css
 │       │   ├── ⚛️ main.tsx
 │       │   └── 📄 vite-env.d.ts
-│       ├── ⚙️ .env
 │       ├── 🚫 .gitignore
 │       ├── ⚙️ eslint.config.js
 │       ├── 🌐 index.html
@@ -72,7 +68,6 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
 │       ├── ⚡ vite.config.ts
 │       └── ⚡ vitest.shims.d.ts
 └── 📁 domain/
-    ├── 📁 node_modules/
     ├── 📁 src/
     │   ├── 📁 entities/
     │   ├── 📁 infrastructure/
@@ -82,7 +77,6 @@ Sistema de e-commerce desarrollado como proyecto final del curso de Programació
     │   ├── 📁 use-cases/
     │   ├── 🔒 package-lock.json
     │   └── 📋 package.json
-    ├── 📁 node_modules/
     ├── 🚫 .gitignore
     ├── 🔒 package-lock.json
     ├── 📋 package.json
