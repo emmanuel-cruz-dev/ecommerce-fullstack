@@ -10,6 +10,7 @@
     },
     "resolveJsonModule": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
