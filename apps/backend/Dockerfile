@@ -1,15 +1,12 @@
-# --- Etapa 1: Preparación del contexto de construcción ---
-# Usamos una imagen ligera de Node.js v20 para la preparación
 FROM node:20 AS context-builder
 
-# Establecemos el directorio de trabajo
+# Establecemos directorio de trabajo
 WORKDIR /usr/src/app
 
 # Copiamos las carpetas de las aplicaciones y del dominio
 COPY ./apps ./apps
 COPY ./domain ./domain
 
-# --- Etapa 2: Construcción del backend ---
 # Usamos la misma imagen base de Node.js v20
 FROM node:20 AS backend-builder
 
@@ -25,19 +22,18 @@ COPY --from=context-builder /usr/src/app/domain ./domain
 COPY --from=context-builder /usr/src/app/apps/backend/package*.json ./apps/backend/
 COPY --from=context-builder /usr/src/app/domain/package*.json ./domain/
 
-# Instalamos las dependencias
+# Instala las dependencias
 WORKDIR /usr/src/app/apps/backend
 RUN npm install
 
-# Copiamos el código fuente
+# Copia el código fuente
 COPY --from=context-builder /usr/src/app/apps/backend ./
 COPY --from=context-builder /usr/src/app/domain ./domain
 
-# Compilamos el código
+# Compila el código
 RUN npm run build
 
-# --- Etapa 3: Producción del backend ---
-# Usamos una imagen de Node.js solo para producción para tener un contenedor más ligero
+# Usa una imagen de Node.js
 FROM node:20-slim
 
 # Establecemos el directorio de trabajo
@@ -49,7 +45,7 @@ COPY --from=backend-builder /usr/src/app/apps/backend/node_modules ./node_module
 COPY --from=backend-builder /usr/src/app/apps/backend/package*.json ./
 COPY --from=backend-builder /usr/src/app/domain ./domain
 
-# Exponemos el puerto
+# Expone el puerto
 EXPOSE 3000
 
 # Comando para iniciar la aplicación
