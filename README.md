@@ -14,7 +14,7 @@ Este proyecto es la culminación de un curso de Programación Fullstack en la **
 - **CRUD de productos** (Solo para admins)
 - **Carrito de compras**
 - **API REST** con Express
-- **Frontend** (Próximamente con React)
+- **Frontend** con React
 
 ---
 
