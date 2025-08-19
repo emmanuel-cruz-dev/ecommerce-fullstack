@@ -139,9 +139,9 @@ npm run dev
 
 ## 🏛️ Arquitectura
 
-Dominio: Entidades, casos de uso y lógica de negocio desacoplada.
-Backend: Implementa la API REST y conecta con el dominio.
-Frontend: SPA en React que consume la API.
+Dominio: Entidades, casos de uso y lógica de negocio desacoplada.  
+Backend: Implementa la API REST y conecta con el dominio.  
+Frontend: SPA en React que consume la API.  
 Arquitectura limpia: Separación clara entre capas, dependencias invertidas.
 
 ---
