@@ -66,7 +66,8 @@ npm run dev
 - **CRUD de productos** (Solo para admins)
 - **Carrito de compras**
 - **API REST** con Express
-- **Frontend** con React
+- **Frontend** con React  
+- **Testing** con Vitest
 
 ---
 
