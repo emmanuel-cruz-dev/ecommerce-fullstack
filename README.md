@@ -59,8 +59,6 @@ npm run dev
 
 ---
 
----
-
 ## 🚀 Características principales
 
 - **Autenticación de usuarios** (Registro/Login con JWT)
@@ -137,6 +135,7 @@ npm run dev
     ├── 📖 README.md
     └── ⚡ vitest.config.ts
 ```
+---
 
 ## 🏛️ Arquitectura
 
