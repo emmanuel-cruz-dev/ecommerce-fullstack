@@ -7,6 +7,60 @@ Este proyecto es la culminación de un curso de Programación Fullstack en la **
 
 ---
 
+## 🧑‍💻 Cómo ejecutar el proyecto
+
+### 1. Instalar dependencias
+
+```sh
+npm install
+cd apps/backend && npm install
+cd apps/frontend && npm install
+cd domain && npm install
+```
+
+### 2. Ejecutar tests (TDD)
+
+#### Dominio
+
+```sh
+cd domain
+npx vitest
+```
+
+#### Backend
+
+```sh
+cd apps/backend
+npx vitest
+```
+
+### 3. Levantar el backend
+
+```sh
+cd apps/backend
+npm run dev
+```
+
+### 4. Levantar el frontend
+
+```sh
+cd apps/frontend
+npm run dev
+```
+
+---
+
+## 🧪 Testing
+
+- Los tests unitarios de la lógica de negocio están en `domain/src/use-cases/*.spec.ts`.
+- El backend también incluye tests en `apps/backend/src/**/*.spec.ts`.
+- Se usa Vitest para pruebas y cobertura.
+- Para TDD, primero escribe los tests en los casos de uso antes de implementar la lógica.
+
+---
+
+---
+
 ## 🚀 Características principales
 
 - **Autenticación de usuarios** (Registro/Login con JWT)
@@ -83,6 +137,14 @@ Este proyecto es la culminación de un curso de Programación Fullstack en la **
     ├── 📖 README.md
     └── ⚡ vitest.config.ts
 ```
+
+## 🏛️ Arquitectura
+
+Dominio: Entidades, casos de uso y lógica de negocio desacoplada.
+Backend: Implementa la API REST y conecta con el dominio.
+Frontend: SPA en React que consume la API.
+Arquitectura limpia: Separación clara entre capas, dependencias invertidas.
+
 ---
 
 ## 🔧 Tecnologías clave
